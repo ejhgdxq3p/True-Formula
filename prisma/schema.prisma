@@ -1,0 +1,122 @@
+// Prisma Schema for Supplement Scheduler
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Supplement {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  slug              String   @unique // canonical name for URL/lookups
+  commonNames       String   // JSON string: string[]
+  category          String   // Enum: SupplementCategory
+  optimalTiming     String   // Enum: TimingPreference
+  dosage            String   // JSON string: { min, max, unit }
+  bioavailability   String?  // JSON string: { emptyStomach, withFood }
+  
+  ingredients       SupplementIngredient[]
+  
+  conflictsAsA      Conflict[] @relation("ConflictA")
+  conflictsAsB      Conflict[] @relation("ConflictB")
+  
+  synergies         SynergySupplement[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("supplements")
+}
+
+model Ingredient {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  chemicalFormula String?
+  mechanisms      String   // JSON string: string[]
+  
+  supplements     SupplementIngredient[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("ingredients")
+}
+
+model SupplementIngredient {
+  id            String     @id @default(cuid())
+  supplementId  String
+  ingredientId  String
+  
+  supplement    Supplement @relation(fields: [supplementId], references: [id], onDelete: Cascade)
+  ingredient    Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@unique([supplementId, ingredientId])
+  @@map("supplement_ingredients")
+}
+
+model Conflict {
+  id                    String   @id @default(cuid())
+  supplementAId         String
+  supplementBId         String
+  
+  supplementA           Supplement @relation("ConflictA", fields: [supplementAId], references: [id], onDelete: Cascade)
+  supplementB           Supplement @relation("ConflictB", fields: [supplementBId], references: [id], onDelete: Cascade)
+  
+  conflictType          String   // Enum: ConflictType
+  severity              String   // Enum: ConflictSeverity
+  explanation           String
+  mechanismDescription  String
+  timeGapMinutes        Int?
+  citations             String?  // JSON string: string[]
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([supplementAId, supplementBId])
+  @@map("conflicts")
+}
+
+model Synergy {
+  id          String   @id @default(cuid())
+  benefit     String
+  mechanism   String
+  optimalRatio String? // JSON string: Record<string, number>
+  
+  supplements SynergySupplement[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("synergies")
+}
+
+model SynergySupplement {
+  id          String    @id @default(cuid())
+  synergyId   String
+  supplementId String
+  
+  synergy     Synergy   @relation(fields: [synergyId], references: [id], onDelete: Cascade)
+  supplement  Supplement @relation(fields: [supplementId], references: [id], onDelete: Cascade)
+
+  @@unique([synergyId, supplementId])
+  @@map("synergy_supplements")
+}
+
+model UserProfile {
+  id                String   @id @default(cuid())
+  email             String?  @unique
+  mealTimes         String?  // JSON: {"breakfast": "08:00", "lunch": "12:00", ...}
+  workoutTime       String?
+  preferences       String?  // JSON: user preferences
+  
+  // TODO: Add user's supplement list, schedule history
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("user_profiles")
+}

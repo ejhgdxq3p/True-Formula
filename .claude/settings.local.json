@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(if [ -d .next ])",
+      "Bash(then rm -rf .next)",
+      "Bash(else echo \".next 目录不存在\")",
+      "Bash(fi)",
+      "Bash(git add:*)"
+    ]
+  }
+}
