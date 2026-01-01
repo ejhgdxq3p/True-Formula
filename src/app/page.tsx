@@ -367,7 +367,7 @@ export default function Home() {
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <main className="min-h-screen bg-grid-pattern text-retro-black font-sans">
         {/* Header */}
-        <header className="border-b-4 border-retro-black bg-retro-yellow px-6 py-4 sticky top-0 z-40 shadow-sm">
+        <header className="border-b-4 border-retro-black px-6 py-4 sticky top-0 z-40" style={{ backgroundColor: '#FDE700' }}>
           <div className="max-w-[1800px] mx-auto flex items-center justify-between">
             <h1 className="text-2xl font-black text-retro-black uppercase font-mono flex items-center gap-2">
               {t.appTitle}

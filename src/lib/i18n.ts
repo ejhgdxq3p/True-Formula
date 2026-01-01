@@ -72,7 +72,7 @@ export const translations = {
   },
   en: {
     // Header
-    appTitle: "TRUE FORMULA",
+    appTitle: "True Formula",
     appSubtitle: "SCIENTIFIC SUPPLEMENT SCHEDULING v1.0",
     importVideo: "IMPORT VIDEO",
     save: "SAVE",

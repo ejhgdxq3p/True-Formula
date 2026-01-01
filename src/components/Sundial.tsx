@@ -59,10 +59,8 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
               </p>
             </div>
 
-            {/* 流星雨进度条区域 */}
-            <div className="relative w-full max-w-xl h-64 bg-retro-yellow border-3 border-retro-black overflow-hidden">
-              <MeteorShowerBars language={language} />
-            </div>
+            {/* 圆形轨道流星动画 */}
+            <MeteorShowerBars language={language} />
           </div>
         ) : sundial ? (
           /* 正常日晷 SVG */
@@ -325,7 +323,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
   );
 }
 
-// AI 流星雨动画子组件
+// AI 圆形轨道流星动画
 function MeteorShowerBars({ language }: { language: Language }) {
   const [progress, setProgress] = React.useState(0);
 
@@ -336,72 +334,126 @@ function MeteorShowerBars({ language }: { language: Language }) {
           clearInterval(interval);
           return 100;
         }
-        return prev + 2;
+        return prev + 1.5;
       });
-    }, 40); // 2秒完成
+    }, 30); // 约2秒完成
 
     return () => clearInterval(interval);
   }, []);
 
-  // 6条错落有致的进度条
-  const bars = [
-    { delay: 0, speed: 1.0, offset: 0 },
-    { delay: 200, speed: 1.2, offset: 15 },
-    { delay: 100, speed: 0.9, offset: 30 },
-    { delay: 300, speed: 1.1, offset: 45 },
-    { delay: 150, speed: 0.95, offset: 60 },
-    { delay: 250, speed: 1.05, offset: 75 },
+  const SIZE = 450;
+  const CENTER = SIZE / 2;
+
+  // 3个同心圆轨道
+  const tracks = [
+    { radius: 180, count: 16 }, // 外圈：16条流星
+    { radius: 130, count: 12 }, // 中圈：12条流星
+    { radius: 80, count: 8 },   // 内圈：8条流星
   ];
 
+  // 生成所有轨道的流星
+  const allMeteors = tracks.flatMap((track, trackIdx) =>
+    Array.from({ length: track.count }, (_, i) => ({
+      radius: track.radius,
+      angle: (i / track.count) * 360, // 均匀分布
+      delay: trackIdx * 15 + i * 5, // 轨道间错开 + 流星间错开
+      speed: 0.9 + Math.random() * 0.3, // 随机速度
+    }))
+  );
+
   return (
-    <>
-      {bars.map((bar, i) => {
-        // 计算每条进度条的实际进度（考虑延迟和速度）
-        const adjustedProgress = Math.max(0, (progress - bar.delay / 40) * bar.speed);
-        const clampedProgress = Math.min(100, adjustedProgress);
+    <div className="relative w-[450px] h-[450px]">
+      <svg width={SIZE} height={SIZE} className="border-4 border-retro-black bg-white">
+        {/* 中心圆 */}
+        <circle
+          cx={CENTER}
+          cy={CENTER}
+          r="40"
+          fill="var(--retro-black)"
+        />
 
-        return (
-          <div
-            key={i}
-            className="absolute h-8"
-            style={{
-              top: `${bar.offset}%`,
-              left: 0,
-              right: 0,
-              transform: 'skewY(-5deg)', // 斜向右下
-            }}
-          >
-            {/* 背景：纯黄色 */}
-            <div className="h-full bg-retro-yellow border-2 border-retro-black relative overflow-hidden">
-              {/* 前景：纯绿色（无渐变！）*/}
-              <div
-                className="absolute inset-y-0 left-0 bg-retro-green transition-all duration-100 ease-linear"
-                style={{
-                  width: `${clampedProgress}%`,
-                }}
-              ></div>
-            </div>
-          </div>
-        );
-      })}
+        {/* 绘制3个轨道圆圈 */}
+        {tracks.map((track, idx) => (
+          <circle
+            key={`track-${idx}`}
+            cx={CENTER}
+            cy={CENTER}
+            r={track.radius}
+            fill="none"
+            stroke="var(--retro-gray)"
+            strokeWidth="3"
+            strokeDasharray="6 6"
+            opacity="0.3"
+          />
+        ))}
 
-      {/* 最终全屏绿色遮罩 */}
-      {progress >= 95 && (
-        <div
-          className="absolute inset-0 bg-retro-green transition-opacity duration-500"
-          style={{
-            opacity: (progress - 95) / 5, // 95-100% 逐渐显示
-          }}
-        ></div>
-      )}
+        {/* 所有流星轨迹 */}
+        {allMeteors.map((meteor, i) => {
+          const adjustedProgress = Math.max(0, (progress - meteor.delay) * meteor.speed);
+          const clampedProgress = Math.min(100, adjustedProgress);
 
-      {/* 进度百分比 */}
-      <div className="absolute bottom-4 left-0 right-0 text-center">
-        <div className="font-black text-4xl font-mono text-retro-green">
+          // 计算起始和结束位置
+          const startAngle = (meteor.angle - 90) * Math.PI / 180; // 从12点方向开始
+          const arcLength = (clampedProgress / 100) * (2 * Math.PI); // 轨迹长度
+
+          // 流星尾巴长度（约40度弧长）
+          const tailLength = Math.PI / 4.5;
+          const startArc = startAngle;
+          const endArc = startAngle + arcLength;
+
+          // 黄色背景条（整条轨迹）
+          const yellowPath = `
+            M ${CENTER + meteor.radius * Math.cos(startArc)} ${CENTER + meteor.radius * Math.sin(startArc)}
+            A ${meteor.radius} ${meteor.radius} 0 ${arcLength > Math.PI ? 1 : 0} 1
+            ${CENTER + meteor.radius * Math.cos(endArc)} ${CENTER + meteor.radius * Math.sin(endArc)}
+          `;
+
+          // 绿色前景条（流星头部）
+          const greenStartArc = Math.max(startArc, endArc - tailLength);
+          const greenPath = clampedProgress > 0 ? `
+            M ${CENTER + meteor.radius * Math.cos(greenStartArc)} ${CENTER + meteor.radius * Math.sin(greenStartArc)}
+            A ${meteor.radius} ${meteor.radius} 0 ${(endArc - greenStartArc) > Math.PI ? 1 : 0} 1
+            ${CENTER + meteor.radius * Math.cos(endArc)} ${CENTER + meteor.radius * Math.sin(endArc)}
+          ` : '';
+
+          return (
+            <g key={i}>
+              {/* 黄色轨迹 */}
+              {clampedProgress > 0 && (
+                <path
+                  d={yellowPath}
+                  fill="none"
+                  stroke="var(--retro-yellow)"
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                />
+              )}
+              {/* 绿色流星头 */}
+              {clampedProgress > 10 && greenPath && (
+                <path
+                  d={greenPath}
+                  fill="none"
+                  stroke="var(--retro-green)"
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                />
+              )}
+            </g>
+          );
+        })}
+
+        {/* 中心文字 */}
+        <text
+          x={CENTER}
+          y={CENTER}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          className="font-mono text-2xl font-black fill-retro-yellow"
+        >
           {Math.round(progress)}%
-        </div>
-      </div>
-    </>
+        </text>
+      </svg>
+    </div>
   );
 }
 

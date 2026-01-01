@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Supplement Scheduler - AI-Powered Conflict Detection",
-  description: "Analyze videos, detect supplement conflicts, and get optimal scheduling",
+  title: "真配方 True Formula - AI智能补剂排程",
+  description: "科学补剂排程系统 - AI分析、冲突检测、智能优化",
 };
 
 export default function RootLayout({
