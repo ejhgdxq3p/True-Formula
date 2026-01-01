@@ -98,45 +98,57 @@ export default function MyList({
             : 'border-retro-green bg-retro-green/5'
         }`}>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">
-              {hasConflicts ? '⚠' : '✓'}
-            </span>
-            <h3 className="font-black text-sm font-mono uppercase text-retro-black">
-              {language === 'zh' ? '成分检测' : 'INGREDIENT CHECK'}
+            <div className={`w-3 h-3 ${hasConflicts ? 'bg-red-500' : 'bg-retro-green'}`}></div>
+            <h3 className="font-black text-xs font-mono uppercase text-retro-black">
+              {language === 'zh' ? '冲突检测' : 'CONFLICT DETECTION'}
             </h3>
           </div>
 
           {hasConflicts ? (
             <div>
-              <div className="text-sm font-bold font-mono text-red-600 mb-2">
+              <div className="text-sm font-mono text-red-600 font-bold mb-3">
                 {language === 'zh'
                   ? `发现 ${conflicts.length} 个营养素冲突`
                   : `${conflicts.length} CONFLICTS DETECTED`
                 }
               </div>
-              <div className="text-xs font-mono text-retro-black/70 mb-3">
-                {conflicts.slice(0, 2).map((c, i) => (
-                  <div key={i}>
-                    · {getNutrientName(c.nutrientA)} × {getNutrientName(c.nutrientB)}
+
+              {/* 显示前3个冲突详情 */}
+              <div className="space-y-2 text-xs font-mono text-retro-black">
+                {conflicts.slice(0, 3).map((conflict: any, i: number) => (
+                  <div key={i} className="bg-white border-2 border-red-300 p-2">
+                    <div className="font-bold text-red-600">
+                      {conflict.severity === 'CRITICAL' ? '🔴' : conflict.severity === 'HIGH' ? '🟠' : '🟡'}
+                      {' '}{conflict.productAName} ↔ {conflict.productBName}
+                    </div>
+                    <div className="text-retro-black/70 mt-1">
+                      {conflict.explanation}
+                    </div>
+                    {conflict.timeGapRequired && conflict.timeGapRequired > 0 && (
+                      <div className="text-retro-green mt-1 font-bold">
+                        → {language === 'zh' ? '建议间隔' : 'Gap'}: {conflict.timeGapRequired / 60}h
+                      </div>
+                    )}
                   </div>
                 ))}
-                {conflicts.length > 2 && (
-                  <div className="text-retro-black/50">
-                    ...{language === 'zh' ? '还有' : 'AND'} {conflicts.length - 2} {language === 'zh' ? '个' : 'MORE'}
+
+                {conflicts.length > 3 && (
+                  <div className="text-center text-retro-black/50 pt-2">
+                    +{conflicts.length - 3} {language === 'zh' ? '个更多冲突' : 'more...'}
                   </div>
                 )}
               </div>
-              <div className="text-xs font-mono text-red-700 font-bold">
-                {language === 'zh'
-                  ? '→ 需要日晷优化调整时间'
-                  : '→ NEEDS SUNDIAL OPTIMIZATION'}
+
+              <div className="text-xs font-mono text-retro-black mt-3 pt-3 border-t border-red-300">
+                → {language === 'zh'
+                  ? '需要日晷优化调整时间'
+                  : 'Use Sundial to optimize timing'
+                }
               </div>
             </div>
           ) : (
-            <div className="text-sm font-mono text-retro-green font-bold">
-              {language === 'zh'
-                ? '所有成分安全，无冲突'
-                : 'ALL INGREDIENTS SAFE'}
+            <div className="text-sm font-mono text-retro-green">
+              ✓ {language === 'zh' ? '所有成分安全，无冲突' : 'All safe, no conflicts'}
             </div>
           )}
         </div>

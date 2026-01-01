@@ -48,16 +48,21 @@ export async function buildConflictGraph(
   // 2. Create Conflict Edges
   conflicts.forEach(c => {
     // Only add edge if both nodes exist in the current graph
-    const sourceExists = supplements.some(s => s.id === c.supplementA);
-    const targetExists = supplements.some(s => s.id === c.supplementB);
+    const sourceId = c.productAId || c.supplementA;
+    const targetId = c.productBId || c.supplementB;
+    
+    if (!sourceId || !targetId) return;
+
+    const sourceExists = supplements.some(s => s.id === sourceId);
+    const targetExists = supplements.some(s => s.id === targetId);
 
     if (sourceExists && targetExists) {
       edges.push({
-        source: c.supplementA,
-        target: c.supplementB,
+        source: sourceId,
+        target: targetId,
         type: "conflict",
         severity: c.severity,
-        mechanism: c.explanation || c.pharmacologicalMechanism,
+        mechanism: c.explanation || c.mechanism || c.pharmacologicalMechanism || "Unknown mechanism",
         value: getConflictWeight(c.severity)
       });
     }
@@ -98,10 +103,11 @@ export function isCombinationSafe(
   conflicts: Conflict[]
 ): boolean {
   // Filter conflicts to only those relevant to the input list
-  const activeConflicts = conflicts.filter(c => 
-    supplementIds.includes(c.supplementA) && 
-    supplementIds.includes(c.supplementB)
-  );
+  const activeConflicts = conflicts.filter(c => {
+    const sourceId = c.productAId || c.supplementA;
+    const targetId = c.productBId || c.supplementB;
+    return sourceId && targetId && supplementIds.includes(sourceId) && supplementIds.includes(targetId);
+  });
 
   // Check for any CRITICAL severity
   const hasCritical = activeConflicts.some(c => c.severity === ConflictSeverity.CRITICAL);

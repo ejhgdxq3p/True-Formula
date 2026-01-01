@@ -67,10 +67,13 @@ export async function generateSchedule(
           const s2 = slot.supplements[j];
 
           // Check if conflict exists
-          const conflict = conflicts.find(c => 
-            (c.supplementA === s1.id && c.supplementB === s2.id) ||
-            (c.supplementA === s2.id && c.supplementB === s1.id)
-          );
+          const conflict = conflicts.find(c => {
+            const sourceId = c.productAId || c.supplementA;
+            const targetId = c.productBId || c.supplementB;
+            if (!sourceId || !targetId) return false;
+            return (sourceId === s1.id && targetId === s2.id) ||
+                   (sourceId === s2.id && targetId === s1.id);
+          });
 
           if (conflict) {
             // Need to move one. 
@@ -331,8 +334,13 @@ export function validateSchedule(
   });
 
   conflicts.forEach(c => {
-    const t1 = suppTimes.get(c.supplementA);
-    const t2 = suppTimes.get(c.supplementB);
+    const sourceId = c.productAId || c.supplementA;
+    const targetId = c.productBId || c.supplementB;
+    
+    if (!sourceId || !targetId) return;
+    
+    const t1 = suppTimes.get(sourceId);
+    const t2 = suppTimes.get(targetId);
 
     if (t1 !== undefined && t2 !== undefined) {
       const gap = Math.abs(t1 - t2);
@@ -341,7 +349,7 @@ export function validateSchedule(
       if (gap < required) {
         // Wrap around check for 24h? Assuming linear day for now, but 23:00 vs 01:00 is 2h gap.
         // Simple linear check for MVP
-        errors.push(`Conflict between ${c.supplementA} and ${c.supplementB}: Gap is ${gap}min, required ${required}min`);
+        errors.push(`Conflict between ${sourceId} and ${targetId}: Gap is ${gap}min, required ${required}min`);
       }
     }
   });

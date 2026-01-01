@@ -49,31 +49,45 @@ export enum TimingPreference {
   ANYTIME = "ANYTIME",
 }
 
-export interface Conflict {
-  id: string;
-  supplementA: string; // supplement ID
-  supplementB: string;
-  type: ConflictType;
-  severity: ConflictSeverity;
-  explanation: string;
-  pharmacologicalMechanism: string;
-  timeGapRequired?: number; // minutes
-  citations?: string[]; // research paper links
-}
-
-export enum ConflictType {
-  ABSORPTION_COMPETITION = "ABSORPTION_COMPETITION", // 吸收竞争
-  ENZYME_INHIBITION = "ENZYME_INHIBITION", // 酶抑制
-  RECEPTOR_COMPETITION = "RECEPTOR_COMPETITION", // 受体竞争
-  PH_INTERFERENCE = "PH_INTERFERENCE", // pH干扰
-  ADVERSE_INTERACTION = "ADVERSE_INTERACTION", // 不良反应
-}
-
 export enum ConflictSeverity {
   CRITICAL = "CRITICAL", // 严重危险，禁止同时服用
   HIGH = "HIGH", // 高度冲突，需间隔4+小时
   MEDIUM = "MEDIUM", // 中度冲突，需间隔2小时
   LOW = "LOW", // 轻度冲突，建议分开
+}
+
+export enum ConflictType {
+  ABSORPTION_COMPETITION = "ABSORPTION_COMPETITION",      // 吸收竞争
+  ABSORPTION_INHIBITION = "ABSORPTION_INHIBITION",        // 吸收抑制
+  ADVERSE_INTERACTION = "ADVERSE_INTERACTION",            // 不良相互作用
+  METABOLISM_INTERFERENCE = "METABOLISM_INTERFERENCE",    // 代谢干扰
+  ENZYME_INHIBITION = "ENZYME_INHIBITION", // 酶抑制
+  RECEPTOR_COMPETITION = "RECEPTOR_COMPETITION", // 受体竞争
+  PH_INTERFERENCE = "PH_INTERFERENCE", // pH干扰
+}
+
+export interface Conflict {
+  id: string;
+  productAId?: string; // product ID
+  productAName?: string;
+  productBId?: string;
+  productBName?: string;
+  
+  // Legacy fields to maintain compatibility if needed, or remove them
+  supplementA?: string; 
+  supplementB?: string;
+
+  nutrientA?: string;        // 营养素ID
+  nutrientB?: string;        // 营养素ID
+  
+  type: ConflictType;
+  severity: ConflictSeverity;
+  explanation: string;      // 用户友好的解释
+  mechanism?: string;        // 药理机制
+  pharmacologicalMechanism?: string; // Legacy field
+  
+  timeGapRequired?: number; // 建议间隔时间（分钟）
+  citations?: string[]; // research paper links
 }
 
 export interface Synergy {

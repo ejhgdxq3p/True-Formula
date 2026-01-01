@@ -10,6 +10,7 @@ import ProductLibraryModal from "@/components/ProductLibraryModal";
 import RotatingPointer from "@/components/RotatingPointer";
 import { useTranslation, type Language } from "@/lib/i18n";
 import type { Product, MyListProduct, Sundial as SundialType, SundialSlot } from "@/types/product";
+import { detectProductConflicts } from "@/lib/product-conflict-detector";
 
 export default function Home() {
   const [language, setLanguage] = useState<Language>('zh');
@@ -72,18 +73,6 @@ export default function Home() {
         });
     });
 
-    const mockSundial: SundialType = {
-        id: "generated-1",
-        name: "My Optimized Schedule",
-        timeSlots: mockSlots.sort((a, b) => a.time.localeCompare(b.time)),
-        conflicts: [],
-        synergies: [],
-        optimizedAt: new Date(),
-        isPublic: false,
-        forkCount: 0,
-        likeCount: 0
-    };
-
     /* In real implementation:
     const res = await fetch('/api/optimize-sundial', {
       method: 'POST',
@@ -94,8 +83,23 @@ export default function Home() {
     setConflicts(data.conflicts);
     */
     
+    // 🔧 NEW: 检测冲突
+    const detectedConflicts = detectProductConflicts(products);
+
+    const mockSundial: SundialType = {
+        id: "generated-1",
+        name: "My Optimized Schedule",
+        timeSlots: mockSlots.sort((a, b) => a.time.localeCompare(b.time)),
+        conflicts: detectedConflicts,  // 使用真实检测结果
+        synergies: [],
+        optimizedAt: new Date(),
+        isPublic: false,
+        forkCount: 0,
+        likeCount: 0
+    };
+    
     setSundial(mockSundial);
-    setConflicts([]); // Mock empty conflicts for now
+    setConflicts(detectedConflicts);
     setIsOptimizing(false);
   };
 

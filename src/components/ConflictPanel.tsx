@@ -132,7 +132,8 @@ export function ConflictPanel({ schedule, language }: ConflictPanelProps) {
 }
 
 // Helper to find name from ID in the schedule
-function getSuppName(id: string, schedule: ScheduleSlot[]) {
+function getSuppName(id: string | undefined, schedule: ScheduleSlot[]) {
+  if (!id) return "Unknown";
   for (const slot of schedule) {
     const found = slot.supplements.find(s => s.id === id);
     if (found) return found.name;
