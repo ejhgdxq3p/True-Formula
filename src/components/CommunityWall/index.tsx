@@ -19,7 +19,13 @@ const mockProduct = (id: string, name: string, brand: string): Product => ({
   optimalTiming: "MORNING_WITH_FOOD" as TimingPreference,
 });
 
-export default function CommunityWall({ language }: { language: Language }) {
+export default function CommunityWall({
+  language,
+  onForkSundial
+}: {
+  language: Language;
+  onForkSundial?: (sundial: Sundial) => void;
+}) {
   const t = useTranslation(language);
   const [selectedSundial, setSelectedSundial] = useState<Sundial | null>(null);
 
@@ -147,7 +153,11 @@ export default function CommunityWall({ language }: { language: Language }) {
   ]);
 
   const handleForkSundial = (sundial: Sundial) => {
-    alert(`已复制日晷 "${sundial.name}" 到你的工作台！`);
+    if (onForkSundial) {
+      onForkSundial(sundial);
+    } else {
+      alert(`已复制日晷 "${sundial.name}" 到你的工作台！`);
+    }
   };
 
   return (

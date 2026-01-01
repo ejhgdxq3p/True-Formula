@@ -100,14 +100,18 @@ export enum NutrientCategory {
 }
 
 /**
- * MyList - 用户手上的产品清单
+ * MyListCollection - 用户的多个产品清单集合
  */
-export interface MyList {
+export interface MyListCollection {
   id: string;
-  userId?: string;
+  name: string;              // "我的增肌方案"
+  description?: string;
   products: MyListProduct[];
   createdAt: Date;
   updatedAt: Date;
+  isFork: boolean;           // 是否是 fork 别人的
+  originalAuthor?: string;   // 如果是 fork，原作者名
+  conflictCount?: number;    // 冲突数量（缓存）
 }
 
 export interface MyListProduct {

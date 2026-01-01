@@ -205,26 +205,70 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
         )}
       </div>
 
-      {/* 时间线列表 */}
+      {/* AI 毒舌点评（替代 timeline）*/}
       {sundial && sundial.timeSlots.length > 0 && (
-        <div className="mt-6 space-y-2 max-h-40 overflow-y-auto">
-          <h3 className="font-bold text-sm font-mono text-retro-black mb-2 border-b-2 border-retro-green pb-1">
-            {language === 'zh' ? '时间线' : 'TIMELINE'}
-          </h3>
-          {sundial.timeSlots.map((slot, i) => (
-            <div key={i} className="flex gap-3 text-xs font-mono">
-              <span className="font-black text-retro-green w-12">{slot.time}</span>
-              <div className="flex-1">
-                {slot.products.map((p, j) => (
-                  <div key={j} className="text-retro-black">
-                    {p.product.brand} - {p.product.name.slice(0, 20)}...
-                  </div>
-                ))}
+        <div className="bg-retro-yellow/20 border-3 border-retro-yellow p-4 mt-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xl">🤖</span>
+            <h3 className="font-black text-sm font-mono uppercase text-retro-black">
+              {language === 'zh' ? 'AI 毒舌点评' : 'AI ROAST'}
+            </h3>
+          </div>
+          <p className="text-sm font-mono text-retro-black leading-relaxed">
+            {generateAIRoast(sundial, language)}
+          </p>
+
+          {/* 统计信息 */}
+          <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t-2 border-retro-yellow text-center text-xs font-mono">
+            <div>
+              <div className="font-black text-2xl text-retro-black">
+                {sundial.timeSlots.reduce((sum, s) => sum + s.products.length, 0)}
               </div>
+              <div className="text-retro-black/60">{language === 'zh' ? '产品' : 'PRODUCTS'}</div>
             </div>
-          ))}
+            <div>
+              <div className={`font-black text-2xl ${sundial.conflicts.length > 0 ? 'text-red-500' : 'text-retro-green'}`}>
+                {sundial.conflicts.length}
+              </div>
+              <div className="text-retro-black/60">{language === 'zh' ? '冲突' : 'CONFLICTS'}</div>
+            </div>
+            <div>
+              <div className="font-black text-2xl text-retro-green">
+                {sundial.synergies?.length || 0}
+              </div>
+              <div className="text-retro-black/60">{language === 'zh' ? '协同' : 'SYNERGIES'}</div>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
+}
+
+// AI 毒舌点评生成器
+function generateAIRoast(sundial: SundialType, language: Language): string {
+  const conflicts = sundial.conflicts.length;
+  const productCount = sundial.timeSlots.reduce((sum, s) => sum + s.products.length, 0);
+
+  if (language === 'zh') {
+    if (conflicts === 0 && productCount <= 5) {
+      return "不错嘛，简洁高效的配方。但说实话，这么保守的搭配我闭着眼睛都能设计出来。";
+    } else if (conflicts === 0 && productCount > 5) {
+      return "啧啧，居然真的0冲突？看来你在这上面下了功夫。不过产品有点多，钱包还好吗？";
+    } else if (conflicts > 0 && conflicts <= 2) {
+      return `有${conflicts}个冲突但还能抢救。建议：别瞎吃，听AI的把时间调开。现在这样吃纯属浪费。`;
+    } else {
+      return `${conflicts}个冲突？你这是补剂还是化学实验？建议从头来过，让AI帮你重新规划。`;
+    }
+  } else {
+    if (conflicts === 0 && productCount <= 5) {
+      return "Clean stack. Simple. Boring. But hey, at least you won't poison yourself.";
+    } else if (conflicts === 0 && productCount > 5) {
+      return "Zero conflicts? Impressive. But that's a lot of pills. Your liver doing okay?";
+    } else if (conflicts > 0 && conflicts <= 2) {
+      return `${conflicts} conflicts detected. Not terrible, but needs work. Let AI fix your timing.`;
+    } else {
+      return `${conflicts} conflicts. Is this a supplement stack or a chemistry disaster? Start over.`;
+    }
+  }
 }
