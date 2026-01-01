@@ -1,0 +1,34 @@
+海报文案（最终定稿版）
+真成分 TRUE FORMULA
+
+拒绝营销滤镜，还原内容真相。 Decode the Noise. Design Your Biology.
+
+01. 核心定义 / DEFINITION
+
+AI 驱动的补剂与饮食规划师 AI-Powered Supplement & Diet Planner
+
+别让健康建议只停留在收藏夹里。True Formula 帮你把复杂的视频内容，直接变成每日服用清单。 它只解决三个最核心的问题： 这瓶该不该吃？吃多少才有效？具体几点钟吃？
+
+Don't just save videos. True Formula transforms complex content into a Daily Intake List. It answers three core questions: Should I take this? What is the effective dosage? What time exactly?
+
+[分割线]
+
+02. 运作机理 / MECHANISM
+
+输入 (INPUT): 任何讲补剂/饮食的短视频 (抖音/TikTok) Short Videos about Supplements & Diet
+
+处理 (PROCESSOR): DeepSeek R1 (负责药理思考) + Qwen2-VL (负责看懂配料表) DeepSeek R1 (Pharmacological Logic) + Qwen2-VL (Reading Labels)
+
+输出 (OUTPUT): 一份即拿即用的执行表。 剔除废话和营销干扰，直接告诉你今天的“药物堆栈”该怎么摆。
+
+A Ready-to-Use Schedule. Strips away marketing noise to tell you exactly how to arrange your "Bio-Stack" today.
+
+[分割线]
+
+03. 核心能力 / CAPABILITIES
+
+> 成分深挖 (Ingredient Extraction) 博主语速太快？药瓶一闪而过？AI 帮你把视频里推荐的所有成分和具体剂量精准扒下来，生成购物清单。 Too fast to hear? AI extracts every ingredient and exact dosage from the video into a shopping list.
+
+> 防冲突预警 (Conflict Alert) 补剂不能乱搭！AI 自动检查你的清单：比如锌和铜会打架，维A见光死。红字警告，帮你避开副作用。 Supplements can clash! AI checks your list (e.g., Zinc blocks Copper). It warns you in red to avoid side effects.
+
+> 智能排程 (Smart Schedule) 别动脑子记时间。系统自动生成一日时间轴：早晨安排提神的（如B族），睡前安排助眠的（如镁），安排得明明白白。 Don't memorize times. The system creates a Daily Timeline: Energy boosters in the morning, sleep aids at night. Organized perfectly.

@@ -30,7 +30,7 @@ export default function MyList({
     <div className="h-full flex flex-col">
       {/* 页签区域 - 3D 立体效果 */}
       <div className="flex items-end gap-1 mb-0 relative z-10">
-        {/* 页签1：当前 List 名称（黑色字体）*/}
+        {/* 页签1：当前 List 名称 - 白色背景 + 黑色字体 */}
         <div className="relative">
           <div className="absolute inset-0 bg-retro-black translate-x-1 translate-y-1"></div>
           <div className="relative bg-white border-3 border-retro-black px-4 py-3 min-w-[120px]">
@@ -43,7 +43,7 @@ export default function MyList({
           </div>
         </div>
 
-        {/* 页签2：工作台（黄色背景 + 黑色字体）*/}
+        {/* 页签2：工作台 - 黄色背景 + 黑色字体 */}
         <button
           onClick={onOpenWorkbench}
           className="relative group"

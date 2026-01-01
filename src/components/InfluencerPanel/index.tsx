@@ -22,70 +22,37 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
   const handleAnalyze = async () => {
     setLoading(true);
     try {
-      // Mock API call for now since we haven't implemented the backend endpoint yet
-      // In a real app, this would be:
-      /*
+      // 调用真实的AI分析API
       const res = await fetch('/api/analyze-influencer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: inputMode === 'text' ? input : videoUrl, mode: inputMode }),
+        body: JSON.stringify({
+          text: inputMode === 'text' ? input : videoUrl,
+          mode: inputMode
+        }),
       });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'AI分析失败');
+      }
+
       const data = await res.json();
+
+      if (!data.success || !data.data) {
+        throw new Error('API返回数据格式错误');
+      }
+
       setAnalysis(data.data);
-      */
-      
-      // Mock delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock data
-      const mockData: InfluencerAnalysis = {
-        id: "mock-1",
-        sourceText: inputMode === 'text' ? input : videoUrl,
-        analyzedAt: new Date(),
-        recommendedProducts: [
-          {
-            productName: "Vitamin D3",
-            brand: "Nature Made",
-            dosage: "2000 IU",
-            confidence: 0.9,
-            // In real app, matchedProduct would come from DB
-            matchedProduct: {
-              id: "nm-vitd3",
-              name: "Nature Made 维生素D3 2000IU",
-              brand: "Nature Made",
-              category: "SINGLE_VITAMIN" as any,
-              ingredients: [],
-              dosagePerServing: "每次1粒",
-              servingsPerDay: 1,
-              optimalTiming: "MORNING_WITH_FOOD",
-            }
-          },
-          {
-            productName: "Fish Oil",
-            brand: "GNC",
-            dosage: "1500mg",
-            confidence: 0.85,
-            matchedProduct: {
-              id: "gnc-triple-strength",
-              name: "GNC Triple Strength 鱼油1500mg",
-              brand: "GNC",
-              category: "OMEGA" as any,
-              ingredients: [],
-              dosagePerServing: "每次1粒",
-              servingsPerDay: 2,
-              optimalTiming: "MORNING_WITH_FOOD",
-            }
-          }
-        ],
-        credibilityScore: 85,
-        warnings: []
-      };
-      
-      setAnalysis(mockData);
       // 默认全选
-      setSelectedProducts(mockData.recommendedProducts.map((p: any, i: number) => i.toString()));
+      setSelectedProducts(data.data.recommendedProducts.map((_: any, i: number) => i.toString()));
     } catch (err) {
-      console.error(err);
+      console.error('AI分析错误:', err);
+      alert(
+        language === 'zh'
+          ? `分析失败: ${err instanceof Error ? err.message : '未知错误'}`
+          : `Analysis failed: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
     } finally {
       setLoading(false);
     }

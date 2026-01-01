@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useDroppable } from "@dnd-kit/core";
 import type { Sundial as SundialType } from "@/types/product";
 import RotatingPointer from "@/components/RotatingPointer";
@@ -37,21 +38,28 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
         )}
       </div>
 
-      {/* AI优化动画 - 已移至全屏流星雨动画，此处不再显示局部动画 */}
+      {/* 日晷可视化区域 */}
+      <div className="bg-retro-green/5 border-3 border-retro-green p-6 flex items-center justify-center min-h-[500px] relative">
+        {isOptimizing ? (
+          /* AI 流星雨动画（占据整个日晷区域）*/
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white">
+            {/* 标题 */}
+            <div className="text-center mb-8">
+              <h3 className="font-black text-2xl font-mono uppercase text-retro-black mb-2">
+                {language === 'zh' ? 'AI 正在分析' : 'AI ANALYZING'}
+              </h3>
+              <p className="text-sm font-mono text-retro-black/60">
+                {language === 'zh' ? '检测冲突、优化时间表...' : 'Optimizing schedule...'}
+              </p>
+            </div>
 
-      {/* 日晷可视化 */}
-      <div 
-        ref={setNodeRef}
-        className={`flex-1 flex items-center justify-center bg-retro-green/5 border-2 border-retro-green ${isOver ? "bg-retro-yellow/10" : ""}`}
-      >
-        {!sundial || sundial.timeSlots.length === 0 ? (
-          <div className="text-center font-mono text-retro-black/50">
-            <div className="text-4xl mb-4">○</div>
-            <div className="text-sm">
-              [{language === 'zh' ? '从左边加产品开始' : 'ADD PRODUCTS TO START'}]
+            {/* 流星雨进度条区域 */}
+            <div className="relative w-full max-w-xl h-64 bg-retro-yellow border-3 border-retro-black overflow-hidden">
+              <MeteorShowerBars language={language} />
             </div>
           </div>
-        ) : (
+        ) : sundial ? (
+          /* 正常日晷 SVG */
           <svg width={SIZE} height={SIZE} className="border-4 border-retro-black bg-white" style={{ imageRendering: 'pixelated' }}>
             {/* 外圈 */}
             <circle
@@ -186,6 +194,14 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
               24H
             </text>
           </svg>
+        ) : (
+          /* 空状态 */
+          <div className="text-center font-mono text-retro-black/50">
+            <div className="text-4xl mb-4">○</div>
+            <div className="text-sm">
+              [{language === 'zh' ? '加产品开始优化' : 'ADD PRODUCTS TO START'}]
+            </div>
+          </div>
         )}
       </div>
 
@@ -226,6 +242,86 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
         </div>
       )}
     </div>
+  );
+}
+
+// AI 流星雨动画子组件
+function MeteorShowerBars({ language }: { language: Language }) {
+  const [progress, setProgress] = React.useState(0);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 2;
+      });
+    }, 40); // 2秒完成
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // 6条错落有致的进度条
+  const bars = [
+    { delay: 0, speed: 1.0, offset: 0 },
+    { delay: 200, speed: 1.2, offset: 15 },
+    { delay: 100, speed: 0.9, offset: 30 },
+    { delay: 300, speed: 1.1, offset: 45 },
+    { delay: 150, speed: 0.95, offset: 60 },
+    { delay: 250, speed: 1.05, offset: 75 },
+  ];
+
+  return (
+    <>
+      {bars.map((bar, i) => {
+        // 计算每条进度条的实际进度（考虑延迟和速度）
+        const adjustedProgress = Math.max(0, (progress - bar.delay / 40) * bar.speed);
+        const clampedProgress = Math.min(100, adjustedProgress);
+
+        return (
+          <div
+            key={i}
+            className="absolute h-8"
+            style={{
+              top: `${bar.offset}%`,
+              left: 0,
+              right: 0,
+              transform: 'skewY(-5deg)', // 斜向右下
+            }}
+          >
+            {/* 背景：纯黄色 */}
+            <div className="h-full bg-retro-yellow border-2 border-retro-black relative overflow-hidden">
+              {/* 前景：纯绿色（无渐变！）*/}
+              <div
+                className="absolute inset-y-0 left-0 bg-retro-green transition-all duration-100 ease-linear"
+                style={{
+                  width: `${clampedProgress}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* 最终全屏绿色遮罩 */}
+      {progress >= 95 && (
+        <div
+          className="absolute inset-0 bg-retro-green transition-opacity duration-500"
+          style={{
+            opacity: (progress - 95) / 5, // 95-100% 逐渐显示
+          }}
+        ></div>
+      )}
+
+      {/* 进度百分比 */}
+      <div className="absolute bottom-4 left-0 right-0 text-center">
+        <div className="font-black text-4xl font-mono text-retro-green">
+          {Math.round(progress)}%
+        </div>
+      </div>
+    </>
   );
 }
 

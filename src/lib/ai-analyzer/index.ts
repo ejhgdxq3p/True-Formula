@@ -2,24 +2,54 @@
  * AI Video Analyzer Module
  *
  * Purpose: Extract supplement information from video transcripts or descriptions
- * using Claude AI.
+ * using AI providers (Claude or DeepSeek).
  */
 
 import Anthropic from "@anthropic-ai/sdk";
 import type { VideoAnalysisResult } from "@/types/supplement";
+import { analyzeWithDeepSeek } from "./deepseek";
+
+/**
+ * Get AI provider from environment variable
+ */
+function getAIProvider(): "claude" | "deepseek" {
+  const provider = process.env.AI_PROVIDER?.toLowerCase();
+  if (provider === "deepseek") return "deepseek";
+  return "claude"; // Default to Claude
+}
 
 /**
  * Analyze video content (transcript or description) to extract supplement info
+ * Automatically selects AI provider based on AI_PROVIDER environment variable
  */
 export async function analyzeVideoContent(
   content: string,
   contentType: "transcript" | "description"
 ): Promise<VideoAnalysisResult> {
+  const provider = getAIProvider();
+
+  console.log(`Using AI provider: ${provider.toUpperCase()}`);
+
+  // Route to appropriate AI provider
+  if (provider === "deepseek") {
+    return analyzeWithDeepSeek(content, contentType);
+  }
+
+  // Default: Claude
+  return analyzeWithClaude(content, contentType);
+}
+
+/**
+ * Analyze using Claude (original implementation)
+ */
+async function analyzeWithClaude(
+  content: string,
+  contentType: "transcript" | "description"
+): Promise<VideoAnalysisResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  
+
   if (!apiKey) {
     console.warn("ANTHROPIC_API_KEY is not set. Using mock response for development.");
-    // Fallback mock response if no key is present (useful for dev/testing without cost)
     return getMockAnalysisResult();
   }
 
@@ -127,3 +157,9 @@ export async function analyzeBatch(videos: string[]): Promise<VideoAnalysisResul
   // TODO: Flag conflicting recommendations across videos
   throw new Error("Not implemented - Phase 2 feature");
 }
+
+/**
+ * Export provider-specific analyzers for testing
+ */
+export { analyzeWithDeepSeek } from "./deepseek";
+export { analyzeWithClaude };

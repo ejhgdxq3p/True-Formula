@@ -46,8 +46,10 @@ export default function WorkbenchModal({
           onSelectList(list.id);
           onClose();
         }}
-        className={`border-3 bg-white p-3 cursor-pointer hover:bg-retro-yellow/10 transition-all ${
-          isActive ? 'border-retro-green shadow-hard' : 'border-retro-green/30'
+        className={`bg-white p-3 cursor-pointer hover:bg-retro-yellow/10 transition-all ${
+          isActive
+            ? 'border-4 border-retro-green shadow-hard'
+            : 'border-3 border-retro-green/30'
         }`}
       >
         {/* 作者信息 */}

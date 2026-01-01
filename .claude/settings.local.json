@@ -8,7 +8,16 @@
       "Bash(fi)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(if [ -d \"public\" ])",
+      "Bash(then echo \"public目录存在\")",
+      "Bash(else mkdir public)",
+      "Bash(npm install:*)",
+      "Bash(if [ -f .env ])",
+      "Bash(then echo \"exists\")",
+      "Bash(else echo \"not exists\")",
+      "Bash(npx tsx:*)",
+      "Bash(npm run dev:*)"
     ]
   }
 }
