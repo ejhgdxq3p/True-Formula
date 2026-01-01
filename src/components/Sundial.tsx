@@ -37,23 +37,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
         )}
       </div>
 
-      {/* AI优化动画 */}
-      {isOptimizing && (
-        <div className="absolute inset-0 bg-retro-green/20 backdrop-blur-sm z-10 flex items-center justify-center">
-          <div className="bg-retro-black border-4 border-retro-yellow p-8 text-center">
-            <div className="text-6xl mb-4 animate-spin">⚙</div>
-            <div className="font-black text-2xl font-mono text-retro-yellow mb-2">
-              AI {language === 'zh' ? '优化中' : 'OPTIMIZING'}
-            </div>
-            <div className="text-sm font-mono text-retro-yellow/80">
-              {language === 'zh' ? '分析营养素冲突...' : 'ANALYZING CONFLICTS...'}
-            </div>
-            <div className="text-sm font-mono text-retro-yellow/80">
-              {language === 'zh' ? '计算最佳时间...' : 'CALCULATING OPTIMAL TIMING...'}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* AI优化动画 - 已移至全屏流星雨动画，此处不再显示局部动画 */}
 
       {/* 日晷可视化 */}
       <div 

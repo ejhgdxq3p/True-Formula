@@ -46,73 +46,75 @@ export default function WorkbenchModal({
           onSelectList(list.id);
           onClose();
         }}
-        className="border-3 border-retro-green bg-white p-4 cursor-pointer hover:bg-retro-yellow/10 transition-colors"
+        className={`border-3 bg-white p-3 cursor-pointer hover:bg-retro-yellow/10 transition-all ${
+          isActive ? 'border-retro-green shadow-hard' : 'border-retro-green/30'
+        }`}
       >
         {/* 作者信息 */}
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 bg-retro-green border-2 border-retro-black flex items-center justify-center font-bold text-white text-sm">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-6 h-6 bg-retro-green border-2 border-retro-black flex items-center justify-center font-bold text-white text-xs">
             {list.isFork ? (list.originalAuthor?.[0] || 'F') : (language === 'zh' ? '我' : 'M')}
           </div>
-          <div className="flex-1">
-            <p className="font-bold text-sm font-mono text-retro-black">
-              {list.isFork ? list.originalAuthor : (language === 'zh' ? '我的清单' : 'My List')}
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-xs font-mono text-retro-black truncate">
+              {list.isFork ? list.originalAuthor : (language === 'zh' ? '我' : 'Me')}
             </p>
-            <p className="text-xs font-mono text-retro-black/50">
-              {new Date(list.createdAt).toLocaleDateString()}
+            <p className="text-[10px] font-mono text-retro-black/50">
+              {new Date(list.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
             </p>
           </div>
         </div>
 
-        {/* 标题（黑底黄字）*/}
-        <h3 className={`font-black text-lg font-mono mb-2 px-2 py-1 truncate ${
+        {/* 标题（黑底黄字，如果选中则黄底黑字）*/}
+        <h3 className={`font-black text-sm font-mono mb-2 px-2 py-1 truncate ${
           isActive ? 'bg-retro-yellow text-retro-black border-2 border-retro-black' : 'bg-retro-black text-retro-yellow'
         }`}>
           {list.name}
         </h3>
 
-        {/* 日晷缩略图 */}
-        <div className="h-32 bg-retro-green/5 border-2 border-retro-green mb-3 flex items-center justify-center">
-          <svg width="120" height="120">
-            <circle cx="60" cy="60" r="50" fill="white" stroke="#009640" strokeWidth="2" />
-            {list.products.slice(0, 8).map((item, i) => {
-              const angle = ((i / 8) * 2 * Math.PI) - Math.PI / 2;
-              const x = 60 + 35 * Math.cos(angle);
-              const y = 60 + 35 * Math.sin(angle);
-              return <circle key={i} cx={x} cy={y} r="5" fill="#FDE700" stroke="#0F380F" strokeWidth="1" />;
+        {/* 日晷缩略图（缩小）*/}
+        <div className="h-24 bg-retro-green/5 border-2 border-retro-green mb-2 flex items-center justify-center">
+          <svg width="90" height="90">
+            <circle cx="45" cy="45" r="38" fill="white" stroke="#009640" strokeWidth="2" />
+            {list.products.slice(0, 6).map((item, i) => {
+              const angle = ((i / 6) * 2 * Math.PI) - Math.PI / 2;
+              const x = 45 + 28 * Math.cos(angle);
+              const y = 45 + 28 * Math.sin(angle);
+              return <circle key={i} cx={x} cy={y} r="4" fill="#FDE700" stroke="#0F380F" strokeWidth="1" />;
             })}
-            <circle cx="60" cy="60" r="15" fill="#0F380F" />
+            <circle cx="45" cy="45" r="12" fill="#0F380F" />
             {isActive && (
-              <text x="60" y="65" textAnchor="middle" className="text-xs font-bold fill-retro-yellow">✓</text>
+              <text x="45" y="49" textAnchor="middle" className="text-xs font-bold fill-retro-green">✓</text>
             )}
           </svg>
         </div>
 
         {/* 统计 */}
-        <div className="text-xs font-mono text-retro-black mb-3 text-center">
-          {list.products.length} {language === 'zh' ? '个产品' : 'PRODUCTS'}
+        <div className="text-[10px] font-mono text-retro-black mb-2 text-center">
+          {list.products.length} {language === 'zh' ? '产品' : 'ITEMS'}
         </div>
 
-        {/* 底部统计条 */}
-        <div className="flex items-center justify-between gap-4 mb-3 text-xs font-mono text-retro-black px-2">
+        {/* 底部统计条（更紧凑）*/}
+        <div className="flex items-center justify-between gap-2 mb-2 text-[10px] font-mono text-retro-black">
           <span className={`font-bold ${!list.conflictCount || list.conflictCount === 0 ? 'text-retro-green' : 'text-red-500'}`}>
-            {!list.conflictCount || list.conflictCount === 0 ? '✓' : '!'} {list.conflictCount || 0} {language === 'zh' ? '冲突' : 'CONF'}
+            {!list.conflictCount || list.conflictCount === 0 ? '✓' : '!'} {list.conflictCount || 0}
           </span>
-          {list.isFork && <span>🔱 FORK</span>}
-          <span className="text-retro-black/60">
+          {list.isFork && <span className="text-[9px]">🔱</span>}
+          <span className="text-retro-black/60 text-[9px]">
             {new Date(list.updatedAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
           </span>
         </div>
 
-        {/* 操作按钮 */}
+        {/* 操作按钮（更小）*/}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onSelectList(list.id);
             onClose();
           }}
-          className={`retro-button w-full py-2 text-sm font-mono font-black text-retro-black`}
+          className={`retro-button w-full py-1 text-xs font-mono font-bold text-retro-black`}
         >
-          {isActive ? (language === 'zh' ? '✓ 当前' : '✓ ACTIVE') : (language === 'zh' ? '选择' : 'SELECT')}
+          {isActive ? '✓' : (language === 'zh' ? '选择' : 'SELECT')}
         </button>
       </div>
     );
@@ -206,7 +208,7 @@ export default function WorkbenchModal({
                   {language === 'zh' ? '我创建的清单' : 'MY LISTS'}
                 </h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 {myLists.map(renderListCard)}
               </div>
             </div>
@@ -220,7 +222,7 @@ export default function WorkbenchModal({
                   {language === 'zh' ? '我 FORK 的清单' : 'FORKED LISTS'}
                 </h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 {forkedLists.map(renderListCard)}
               </div>
             </div>

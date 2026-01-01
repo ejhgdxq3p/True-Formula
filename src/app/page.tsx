@@ -9,6 +9,7 @@ import InfluencerPanel from "@/components/InfluencerPanel";
 import CommunityWall from "@/components/CommunityWall";
 import ProductLibraryModal from "@/components/ProductLibraryModal";
 import RotatingPointer from "@/components/RotatingPointer";
+import AILoadingAnimation from "@/components/AILoadingAnimation";
 import { useTranslation, type Language } from "@/lib/i18n";
 import type { Product, MyListProduct, Sundial as SundialType, SundialSlot, MyListCollection } from "@/types/product";
 import { detectProductConflicts } from "@/lib/product-conflict-detector";
@@ -291,6 +292,12 @@ export default function Home() {
             language={language}
           />
         )}
+
+        {/* AI 流星雨动画 */}
+        <AILoadingAnimation
+          isActive={isOptimizing}
+          language={language}
+        />
 
         <DragOverlay>
           {activeProduct ? (
