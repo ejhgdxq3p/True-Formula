@@ -50,6 +50,18 @@ export enum ProductCategory {
   IMMUNITY = "IMMUNITY",                // 免疫力
   SLEEP = "SLEEP",                      // 助眠
   ENERGY = "ENERGY",                    // 能量/抗疲劳
+
+  // 日常食材
+  FOOD_MEAT = "FOOD_MEAT",              // 肉类
+  FOOD_EGG = "FOOD_EGG",                // 蛋类
+  FOOD_VEGETABLE = "FOOD_VEGETABLE",    // 蔬菜
+  FOOD_ORGAN = "FOOD_ORGAN",            // 内脏
+
+  // 健康饮品
+  BEVERAGE_TEA = "BEVERAGE_TEA",        // 茶类
+  BEVERAGE_SOY = "BEVERAGE_SOY",        // 豆制品饮料
+  BEVERAGE_JUICE = "BEVERAGE_JUICE",    // 果汁
+  BEVERAGE_OTHER = "BEVERAGE_OTHER",    // 其他饮品
 }
 
 /**
@@ -120,6 +132,9 @@ export interface Sundial {
   // 检测结果
   conflicts: Conflict[];
   synergies: Synergy[];
+
+  // AI毒舌点评
+  aiRoast?: string;
 
   // 元数据
   optimizedAt: Date;         // 最后一次AI优化时间

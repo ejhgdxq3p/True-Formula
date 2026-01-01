@@ -71,4 +71,20 @@ export const NUTRIENTS_DATABASE: Nutrient[] = [
   // === 益生菌菌株 ===
   { id: "lacto-acidophilus", name: "嗜酸乳杆菌", commonName: "嗜酸乳杆菌", category: "PROBIOTIC_STRAIN" as any, aliases: ["Lactobacillus Acidophilus"] },
   { id: "bifido-bifidum", name: "双歧杆菌", commonName: "双歧杆菌", category: "PROBIOTIC_STRAIN" as any, aliases: ["Bifidobacterium Bifidum"] },
+
+  // === 其他 (如咖啡因、单宁酸) ===
+  {
+    id: "caffeine",
+    name: "咖啡因",
+    commonName: "咖啡因",
+    category: "ANTIOXIDANT" as any,
+    aliases: ["Caffeine", "咖啡碱"]
+  },
+  {
+    id: "tannin",
+    name: "单宁酸/茶多酚",
+    commonName: "茶多酚",
+    category: "ANTIOXIDANT" as any,
+    aliases: ["Tannin", "茶多酚", "EGCG"]
+  },
 ];

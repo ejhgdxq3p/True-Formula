@@ -1,128 +1,128 @@
-import { Product, ProductCategory } from "@/types/product";
-import { NUTRIENTS_DATABASE } from "./nutrients";
+# 💥 扩充补剂库 - 增加高冲突产品 - Cursor 执行指令
 
-/**
- * 真实市场产品数据库（中国+全球热门品牌）
- */
+---
+
+## 目标
+
+扩充 `src/data/products.ts` 和 `src/data/nutrients.ts`，添加**容易产生冲突**的补剂、食材和饮品，让用户随便选几个就能触发冲突检测！
+
+---
+
+## 核心冲突组合（必须覆盖）
+
+### 🔴 严重冲突 (CRITICAL)
+1. **铁 + 钙** - 严重竞争吸收，必须间隔4小时以上
+2. **铁 + 茶/咖啡** - 茶多酚/咖啡因严重抑制铁吸收
+3. **高剂量维生素E + 鱼油** - 抗凝血作用叠加，出血风险
+4. **钙 + 甲状腺药物** - 严重影响药物吸收
+
+### 🟠 高度冲突 (HIGH)
+1. **钙 + 镁** - 竞争同一吸收通道
+2. **铁 + 锌** - 竞争吸收
+3. **钙 + 锌** - 竞争吸收
+4. **维生素C高剂量 + 铜** - 影响铜吸收
+
+### 🟡 中度冲突 (MEDIUM)
+1. **脂溶性维生素过量组合** (A+D+E+K)
+2. **B族维生素不平衡** (单独大量B6会影响其他B族)
+3. **钙 + 铁 + 锌** 三者同时服用
+
+---
+
+## Task 1: 扩充营养素数据库
+
+**文件**: `src/data/nutrients.ts`
+
+确保包含以下营养素（如果没有就添加）：
+
+```typescript
+export const NUTRIENTS_DATABASE: Nutrient[] = [
+  // === 已有的保持不变 ===
+
+  // === 确保以下营养素存在 ===
+
+  // 容易冲突的矿物质
+  {
+    id: "iron",
+    name: "铁 (Fe)",
+    commonName: "铁",
+    category: NutrientCategory.TRACE_MINERAL,
+    aliases: ["Iron", "Fe", "Ferrous", "血红素铁"]
+  },
+  {
+    id: "calcium",
+    name: "钙 (Ca)",
+    commonName: "钙",
+    category: NutrientCategory.MACRO_MINERAL,
+    aliases: ["Calcium", "Ca", "碳酸钙", "柠檬酸钙"]
+  },
+  {
+    id: "zinc",
+    name: "锌 (Zn)",
+    commonName: "锌",
+    category: NutrientCategory.TRACE_MINERAL,
+    aliases: ["Zinc", "Zn", "葡萄糖酸锌"]
+  },
+  {
+    id: "magnesium",
+    name: "镁 (Mg)",
+    commonName: "镁",
+    category: NutrientCategory.MACRO_MINERAL,
+    aliases: ["Magnesium", "Mg", "氧化镁"]
+  },
+  {
+    id: "copper",
+    name: "铜 (Cu)",
+    commonName: "铜",
+    category: NutrientCategory.TRACE_MINERAL,
+    aliases: ["Copper", "Cu"]
+  },
+
+  // 抗氧化剂/抗凝血相关
+  {
+    id: "vit-e",
+    name: "维生素E (生育酚)",
+    commonName: "维生素E",
+    category: NutrientCategory.VITAMIN_FAT_SOLUBLE,
+    aliases: ["Vitamin E", "Tocopherol", "VE"]
+  },
+  {
+    id: "vit-k1",
+    name: "维生素K1 (叶绿醌)",
+    commonName: "维生素K",
+    category: NutrientCategory.VITAMIN_FAT_SOLUBLE,
+    aliases: ["Vitamin K", "Phylloquinone", "VK"]
+  },
+
+  // 其他
+  {
+    id: "caffeine",
+    name: "咖啡因",
+    commonName: "咖啡因",
+    category: NutrientCategory.ANTIOXIDANT,
+    aliases: ["Caffeine", "咖啡碱"]
+  },
+  {
+    id: "tannin",
+    name: "单宁酸/茶多酚",
+    commonName: "茶多酚",
+    category: NutrientCategory.ANTIOXIDANT,
+    aliases: ["Tannin", "茶多酚", "EGCG"]
+  },
+];
+```
+
+---
+
+## Task 2: 大量扩充产品数据库
+
+**文件**: `src/data/products.ts`
+
+在现有产品后添加以下产品：
+
+```typescript
 export const PRODUCTS_DATABASE: Product[] = [
-  // === 汤臣倍健 (By-Health) ===
-  {
-    id: "bh-calcium-d3",
-    name: "汤臣倍健 液体钙软胶囊",
-    brand: "汤臣倍健",
-    category: ProductCategory.MINERAL,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "calcium")!, amount: 600, unit: "mg", percentDV: 75 },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-d3")!, amount: 5, unit: "mcg", percentDV: 100 }
-    ],
-    dosagePerServing: "每次2粒",
-    servingsPerDay: 1,
-    optimalTiming: "MORNING_WITH_FOOD",
-    price: 129,
-    rating: 4.7,
-  },
-  {
-    id: "bh-omega3",
-    name: "汤臣倍健 深海鱼油软胶囊",
-    brand: "汤臣倍健",
-    category: ProductCategory.OMEGA,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "epa")!, amount: 180, unit: "mg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "dha")!, amount: 120, unit: "mg" }
-    ],
-    dosagePerServing: "每次2粒",
-    servingsPerDay: 2,
-    optimalTiming: "MORNING_WITH_FOOD",
-    price: 198,
-    rating: 4.6,
-  },
-
-  // === Swisse (澳洲) ===
-  {
-    id: "swisse-multivitamin",
-    name: "Swisse 男士复合维生素",
-    brand: "Swisse",
-    category: ProductCategory.MULTIVITAMIN,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-a")!, amount: 750, unit: "mcg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-c")!, amount: 165, unit: "mg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-d3")!, amount: 25, unit: "mcg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-e")!, amount: 41, unit: "mg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-b12")!, amount: 30, unit: "mcg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "zinc")!, amount: 8, unit: "mg" },
-    ],
-    dosagePerServing: "每次1片",
-    servingsPerDay: 1,
-    optimalTiming: "MORNING_WITH_FOOD",
-    price: 268,
-    rating: 4.8,
-  },
-
-  // === Nature Made (美国) ===
-  {
-    id: "nm-vitd3",
-    name: "Nature Made 维生素D3 2000IU",
-    brand: "Nature Made",
-    category: ProductCategory.SINGLE_VITAMIN,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-d3")!, amount: 50, unit: "mcg", percentDV: 250 }
-    ],
-    dosagePerServing: "每次1粒",
-    servingsPerDay: 1,
-    optimalTiming: "MORNING_WITH_FOOD",
-    price: 89,
-    rating: 4.9,
-  },
-
-  // === GNC (美国) ===
-  {
-    id: "gnc-triple-strength",
-    name: "GNC Triple Strength 鱼油1500mg",
-    brand: "GNC",
-    category: ProductCategory.OMEGA,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "epa")!, amount: 647, unit: "mg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "dha")!, amount: 253, unit: "mg" }
-    ],
-    dosagePerServing: "每次1粒",
-    servingsPerDay: 2,
-    optimalTiming: "MORNING_WITH_FOOD",
-    price: 328,
-    rating: 4.7,
-  },
-
-  // === 修正 (XiuZheng) ===
-  {
-    id: "xz-calcium-mag",
-    name: "修正 钙镁片",
-    brand: "修正",
-    category: ProductCategory.MINERAL,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "calcium")!, amount: 500, unit: "mg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "magnesium")!, amount: 250, unit: "mg" }
-    ],
-    dosagePerServing: "每次2片",
-    servingsPerDay: 1,
-    optimalTiming: "BEFORE_BED",
-    price: 68,
-    rating: 4.4,
-  },
-
-  // === 纽崔莱 (Nutrilite) ===
-  {
-    id: "nutri-protein",
-    name: "纽崔莱 蛋白质粉",
-    brand: "纽崔莱",
-    category: ProductCategory.PROTEIN,
-    ingredients: [
-      // 含所有必需氨基酸
-    ],
-    dosagePerServing: "每次10g (1勺)",
-    servingsPerDay: 2,
-    optimalTiming: "POST_WORKOUT",
-    price: 398,
-    rating: 4.6,
-  },
+  // ...保留现有所有产品
 
   // === 高冲突补剂 - 铁剂系列 ===
   {
@@ -484,119 +484,96 @@ export const PRODUCTS_DATABASE: Product[] = [
     price: 138,
     rating: 4.6,
   },
-
-  // === 日常食材 ===
-  {
-    id: "food-beef-liver",
-    name: "牛肝",
-    brand: "日常食材",
-    category: ProductCategory.FOOD_ORGAN,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-a")!, amount: 16899, unit: "mcg", percentDV: 1877 },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-b12")!, amount: 111, unit: "mcg", percentDV: 4625 },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "iron")!, amount: 6.5, unit: "mg", percentDV: 36 },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "copper")!, amount: 12, unit: "mg" },
-    ],
-    dosagePerServing: "100g",
-    servingsPerDay: 1,
-    optimalTiming: "AFTERNOON",
-  },
-  {
-    id: "food-egg",
-    name: "鸡蛋",
-    brand: "日常食材",
-    category: ProductCategory.FOOD_EGG,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-b12")!, amount: 1.3, unit: "mcg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-d3")!, amount: 2, unit: "mcg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "selenium")!, amount: 31, unit: "mcg" },
-    ],
-    dosagePerServing: "1个 (50g)",
-    servingsPerDay: 2,
-    optimalTiming: "MORNING_WITH_FOOD",
-  },
-  {
-    id: "food-spinach",
-    name: "菠菜",
-    brand: "日常食材",
-    category: ProductCategory.FOOD_VEGETABLE,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-k1")!, amount: 483, unit: "mcg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-a")!, amount: 469, unit: "mcg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "iron")!, amount: 2.7, unit: "mg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "magnesium")!, amount: 79, unit: "mg" },
-    ],
-    dosagePerServing: "100g",
-    servingsPerDay: 1,
-    optimalTiming: "AFTERNOON",
-  },
-  {
-    id: "food-salmon",
-    name: "三文鱼",
-    brand: "日常食材",
-    category: ProductCategory.FOOD_MEAT,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "epa")!, amount: 862, unit: "mg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "dha")!, amount: 1104, unit: "mg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-b12")!, amount: 3.2, unit: "mcg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "vit-d3")!, amount: 11, unit: "mcg" },
-    ],
-    dosagePerServing: "100g",
-    servingsPerDay: 1,
-    optimalTiming: "AFTERNOON",
-  },
-
-  // === 健康饮品 ===
-  {
-    id: "beverage-soy-milk",
-    name: "豆浆",
-    brand: "健康饮品",
-    category: ProductCategory.BEVERAGE_SOY,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "calcium")!, amount: 25, unit: "mg" },
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "magnesium")!, amount: 25, unit: "mg" },
-      // 大豆异黄酮等
-    ],
-    dosagePerServing: "250ml",
-    servingsPerDay: 1,
-    optimalTiming: "MORNING_WITH_FOOD",
-  },
-  {
-    id: "beverage-green-tea",
-    name: "绿茶",
-    brand: "健康饮品",
-    category: ProductCategory.BEVERAGE_TEA,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "green-tea")!, amount: 200, unit: "mg" }, // EGCG
-      // 咖啡因、茶多酚等
-    ],
-    dosagePerServing: "250ml",
-    servingsPerDay: 3,
-    optimalTiming: "MORNING",
-  },
-  {
-    id: "beverage-matcha",
-    name: "抹茶",
-    brand: "健康饮品",
-    category: ProductCategory.BEVERAGE_TEA,
-    ingredients: [
-      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "green-tea")!, amount: 500, unit: "mg" },
-      // 更高浓度的茶多酚
-    ],
-    dosagePerServing: "2g粉 + 250ml水",
-    servingsPerDay: 1,
-    optimalTiming: "MORNING",
-  },
-  {
-    id: "beverage-black-coffee",
-    name: "黑咖啡",
-    brand: "健康饮品",
-    category: ProductCategory.BEVERAGE_OTHER,
-    ingredients: [
-      // 咖啡因、抗氧化剂
-    ],
-    dosagePerServing: "250ml",
-    servingsPerDay: 2,
-    optimalTiming: "MORNING",
-  },
 ];
+```
+
+---
+
+## Task 3: 更新 SupplementDrawer 分类标签
+
+**文件**: `src/components/SupplementDrawer/index.tsx`
+
+在 `getCategoryLabel` 函数中添加新分类的标签：
+
+```typescript
+function getCategoryLabel(cat: ProductCategory, lang: Language): string {
+  const labels: Record<Language, Record<ProductCategory, string>> = {
+    zh: {
+      MULTIVITAMIN: "综合维生素",
+      SINGLE_VITAMIN: "单一维生素",
+      MINERAL: "矿物质",
+      OMEGA: "Omega脂肪酸",
+      PROTEIN: "蛋白质",
+      PROBIOTIC: "益生菌",
+      HERBAL: "草本植物",
+      SPORTS: "运动营养",
+      BEAUTY: "美容保健",
+      JOINT: "关节骨骼",
+      IMMUNITY: "免疫力",
+      SLEEP: "助眠",
+      ENERGY: "能量",
+
+      // 日常食材
+      FOOD_MEAT: "肉类",
+      FOOD_EGG: "蛋类",
+      FOOD_VEGETABLE: "蔬菜",
+      FOOD_ORGAN: "内脏",
+
+      // 健康饮品
+      BEVERAGE_TEA: "茶类",
+      BEVERAGE_SOY: "豆制品",
+      BEVERAGE_JUICE: "果汁",
+      BEVERAGE_OTHER: "其他饮品",
+    },
+    en: {
+      MULTIVITAMIN: "MULTIVITAMIN",
+      SINGLE_VITAMIN: "SINGLE VITAMIN",
+      MINERAL: "MINERAL",
+      OMEGA: "OMEGA",
+      PROTEIN: "PROTEIN",
+      PROBIOTIC: "PROBIOTIC",
+      HERBAL: "HERBAL",
+      SPORTS: "SPORTS",
+      BEAUTY: "BEAUTY",
+      JOINT: "JOINT",
+      IMMUNITY: "IMMUNITY",
+      SLEEP: "SLEEP",
+      ENERGY: "ENERGY",
+
+      // 日常食材
+      FOOD_MEAT: "MEAT",
+      FOOD_EGG: "EGG",
+      FOOD_VEGETABLE: "VEGETABLE",
+      FOOD_ORGAN: "ORGAN",
+
+      // 健康饮品
+      BEVERAGE_TEA: "TEA",
+      BEVERAGE_SOY: "SOY",
+      BEVERAGE_JUICE: "JUICE",
+      BEVERAGE_OTHER: "BEVERAGE",
+    }
+  };
+  return labels[lang][cat] || cat;
+}
+```
+
+---
+
+## ✅ 验收标准
+
+完成后应该：
+- [ ] 补剂库至少有 **30+ 产品**
+- [ ] 包含 **铁剂 3+ 种**（会和钙/茶/咖啡冲突）
+- [ ] 包含 **钙剂 3+ 种**（会和铁/锌/镁冲突）
+- [ ] 包含 **锌剂 2+ 种**（会和铁/钙冲突）
+- [ ] 包含 **高剂量维生素E 2+ 种**（会和鱼油冲突）
+- [ ] 包含 **咖啡/茶类饮品 5+ 种**（会抑制铁吸收）
+- [ ] 包含 **高铁食材 5+ 种**（肝脏、红肉等）
+- [ ] 包含 **高钙食材 5+ 种**（牛奶、奶酪、豆腐等）
+- [ ] 用户随便选择 **铁剂 + 钙剂** → 立刻触发严重冲突 🔴
+- [ ] 用户选择 **铁剂 + 绿茶** → 触发高度冲突 🟠
+- [ ] 用户选择 **钙镁锌片 + 铁剂** → 触发多重冲突 💥
+
+---
+
+**Cursor，开始扩充产品库，让冲突满天飞！** 💥

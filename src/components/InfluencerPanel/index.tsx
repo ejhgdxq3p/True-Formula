@@ -13,6 +13,8 @@ interface InfluencerPanelProps {
 export default function InfluencerPanel({ onAdoptProducts, language }: InfluencerPanelProps) {
   const t = useTranslation(language);
   const [input, setInput] = useState("");
+  const [inputMode, setInputMode] = useState<'text' | 'video'>('text');
+  const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<InfluencerAnalysis | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -26,7 +28,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
       const res = await fetch('/api/analyze-influencer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: input }),
+        body: JSON.stringify({ text: inputMode === 'text' ? input : videoUrl, mode: inputMode }),
       });
       const data = await res.json();
       setAnalysis(data.data);
@@ -38,7 +40,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
       // Mock data
       const mockData: InfluencerAnalysis = {
         id: "mock-1",
-        sourceText: input,
+        sourceText: inputMode === 'text' ? input : videoUrl,
         analyzedAt: new Date(),
         recommendedProducts: [
           {
@@ -108,17 +110,59 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
         </h2>
       </div>
 
-      {/* 输入区 */}
-      <textarea
-        className="w-full h-32 p-3 border-3 border-retro-green font-mono text-sm bg-white mb-3 resize-none text-retro-black placeholder:text-retro-gray/50"
-        placeholder={language === 'zh' ? '粘贴博主推荐文字...' : 'PASTE INFLUENCER CONTENT...'}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
+      {/* 模式切换 */}
+      <div className="flex gap-2 mb-3">
+        <button
+          onClick={() => setInputMode('text')}
+          className={`flex-1 py-2 font-mono font-bold border-2 border-retro-black ${
+            inputMode === 'text'
+              ? 'bg-retro-yellow text-retro-black'
+              : 'bg-white text-retro-black hover:bg-gray-100'
+          }`}
+        >
+          {language === 'zh' ? '文字' : 'TEXT'}
+        </button>
+        <button
+          onClick={() => setInputMode('video')}
+          className={`flex-1 py-2 font-mono font-bold border-2 border-retro-black ${
+            inputMode === 'video'
+              ? 'bg-retro-yellow text-retro-black'
+              : 'bg-white text-retro-black hover:bg-gray-100'
+          }`}
+        >
+          {language === 'zh' ? '视频' : 'VIDEO'}
+        </button>
+      </div>
+
+      {/* 输入区 - 文字模式 */}
+      {inputMode === 'text' && (
+        <textarea
+          className="w-full h-32 p-3 border-3 border-retro-green font-mono text-sm bg-white mb-3 resize-none text-retro-black placeholder:text-retro-gray/50"
+          placeholder={language === 'zh' ? '粘贴博主推荐文字...' : 'PASTE CONTENT...'}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+      )}
+
+      {/* 输入区 - 视频模式 */}
+      {inputMode === 'video' && (
+        <div className="space-y-3 mb-3">
+          <input
+            type="text"
+            className="w-full p-3 border-3 border-retro-green font-mono text-sm bg-white text-retro-black placeholder:text-retro-gray/50"
+            placeholder={language === 'zh' ? '粘贴视频链接 (YouTube/B站/抖音)...' : 'PASTE VIDEO URL...'}
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+          />
+          <div className="text-xs font-mono text-retro-black/50 bg-retro-green/10 p-2 border-2 border-retro-green">
+            {language === 'zh' ? '支持' : 'SUPPORTED'}: YouTube, Bilibili, Douyin, Xiaohongshu
+          </div>
+        </div>
+      )}
 
       <button
         onClick={handleAnalyze}
-        disabled={loading || !input.trim()}
+        disabled={loading || (inputMode === 'text' ? !input.trim() : !videoUrl.trim())}
         className="retro-button w-full py-3 mb-4 font-mono font-black text-retro-black disabled:opacity-50"
       >
         {loading

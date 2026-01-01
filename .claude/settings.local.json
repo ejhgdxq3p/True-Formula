@@ -6,7 +6,9 @@
       "Bash(then rm -rf .next)",
       "Bash(else echo \".next 目录不存在\")",
       "Bash(fi)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
