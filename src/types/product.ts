@@ -138,7 +138,7 @@ export interface Sundial {
   synergies: Synergy[];
 
   // AI毒舌点评
-  aiRoast?: string;
+  aiCommentary?: string;
 
   // 元数据
   optimizedAt: Date;         // 最后一次AI优化时间

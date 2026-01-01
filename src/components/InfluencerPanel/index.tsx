@@ -65,6 +65,12 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
       .filter(Boolean);
 
     onAdoptProducts(productsToAdopt);
+
+    // 清空选择状态，避免重复添加
+    setSelectedProducts([]);
+    setAnalysis(null);
+    setInput('');
+    setVideoUrl('');
   };
 
   return (

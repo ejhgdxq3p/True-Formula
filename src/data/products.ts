@@ -115,7 +115,8 @@ export const PRODUCTS_DATABASE: Product[] = [
     brand: "纽崔莱",
     category: ProductCategory.PROTEIN,
     ingredients: [
-      // 含所有必需氨基酸
+      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "protein")!, amount: 8, unit: "g", percentDV: 16 },
+      { nutrient: NUTRIENTS_DATABASE.find(n => n.id === "calcium")!, amount: 50, unit: "mg", percentDV: 6 },
     ],
     dosagePerServing: "每次10g (1勺)",
     servingsPerDay: 2,

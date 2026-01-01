@@ -104,6 +104,53 @@ const NUTRIENT_CONFLICT_RULES = [
     mechanism: "锌诱导金属硫蛋白合成，优先结合铜",
     timeGapRequired: 120,
   },
+  {
+    nutrientA: "vit-c",
+    nutrientB: "epa",
+    severity: "MEDIUM" as ConflictSeverity,
+    type: "OXIDATION_RISK",
+    explanation: "高剂量维生素C（>1000mg）与鱼油同服可能加速鱼油氧化，降低效果",
+    mechanism: "维生素C在某些条件下可能促进脂质氧化",
+    timeGapRequired: 120,
+  },
+  {
+    nutrientA: "vit-c",
+    nutrientB: "dha",
+    severity: "MEDIUM" as ConflictSeverity,
+    type: "OXIDATION_RISK",
+    explanation: "高剂量维生素C（>1000mg）与鱼油同服可能加速鱼油氧化，降低效果",
+    mechanism: "维生素C在某些条件下可能促进脂质氧化",
+    timeGapRequired: 120,
+  },
+  {
+    nutrientA: "calcium",
+    nutrientB: "protein",
+    severity: "MEDIUM" as ConflictSeverity,
+    type: "ABSORPTION_COMPETITION",
+    explanation: "高钙摄入可能影响蛋白质吸收，建议间隔1-2小时",
+    mechanism: "钙可能与蛋白质形成不溶性复合物",
+    timeGapRequired: 90,
+  },
+
+  // === 轻度冲突 (LOW) ===
+  {
+    nutrientA: "vit-e",
+    nutrientB: "vit-c",
+    severity: "LOW" as ConflictSeverity,
+    type: "SYNERGY_REDUCED",
+    explanation: "维生素E和C虽然协同，但大剂量同服可能相互氧化，建议分开服用",
+    mechanism: "两者在体内相互作用可能降低彼此稳定性",
+    timeGapRequired: 60,
+  },
+  {
+    nutrientA: "iron",
+    nutrientB: "protein",
+    severity: "LOW" as ConflictSeverity,
+    type: "ABSORPTION_ENHANCED",
+    explanation: "蛋白质会增强铁的吸收，这是好事，但注意铁过量风险",
+    mechanism: "蛋白质提供氨基酸帮助铁转运",
+    timeGapRequired: 0,
+  },
 ];
 
 /**

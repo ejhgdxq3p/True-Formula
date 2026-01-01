@@ -58,34 +58,35 @@ async function analyzeWithClaude(
   });
 
   const prompt = `
-  You are an expert nutritionist and pharmacologist. Analyze the following video ${contentType} to extract supplement recommendations.
-  
-  Your task:
-  1. Identify ALL supplements mentioned.
-  2. Extract recommended dosages and timing if mentioned.
-  3. Identify the reasoning provided in the text.
-  4. Detect any warnings, side effects, or dangerous combinations mentioned.
-  5. Evaluate the credibility of the content (0-100) based on:
-     - Scientific citations provided?
-     - Biological mechanisms explained correctly?
-     - Over-hyped marketing claims? (deduct points)
-     - Safe dosage recommendations?
+  你是一位资深营养学家和药理学专家。分析以下内容，提取所有与健康相关的补剂和食材。
 
-  Output purely valid JSON in the following format, with no extra text:
+  重要规则：
+  1. 识别所有提到的补剂（维生素、矿物质、蛋白粉等）
+  2. 识别所有提到的日常食材（肉类、蔬菜、水果、蛋类、豆制品等）
+  3. 只要提到健康特性、营养成分、食物相冲等信息，都要提取
+  4. 不要卡得太严，有一点点健康相关就提取
+  5. 如果没有明确品牌，标记为 "无品牌"
+  6. 提取剂量、时间、原因（如果有）
+  7. 标注食物之间的冲突或协同（如果提到）
+
+  输出纯JSON格式，不要额外文字：
   {
     "supplements": [
       {
-        "name": "Standardized Name (e.g. Vitamin D3)",
-        "dosage": "e.g. 2000 IU (or null)",
-        "timing": "e.g. Morning with fat (or null)",
-        "reasoning": "Brief explanation of why it is recommended"
+        "name": "标准名称（如：维生素D3 或 鸡蛋 或 西兰花）",
+        "brand": "品牌名（如果有）或 null",
+        "dosage": "剂量（如：2000 IU 或 每天1个 或 100g）或 null",
+        "timing": "时间（如：早晨空腹 或 饭后）或 null",
+        "reasoning": "推荐原因",
+        "isFood": true/false,
+        "category": "补剂类别或食材类别（如：SINGLE_VITAMIN, FOOD_EGG, FOOD_MEAT等）"
       }
     ],
-    "warnings": ["Warning 1", "Warning 2"],
-    "credibilityScore": 75
+    "warnings": ["警告1（如：不要和XX一起吃）"],
+    "credibilityScore": 0-100
   }
 
-  Content to analyze:
+  内容：
   ${content}
   `;
 

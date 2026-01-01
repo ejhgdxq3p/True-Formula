@@ -113,9 +113,12 @@ export interface ScheduleSlot {
 export interface VideoAnalysisResult {
   supplements: {
     name: string;
+    brand?: string; // 品牌名（如果有）
     dosage?: string;
     timing?: string;
     reasoning?: string; // Why the video recommends this
+    isFood?: boolean; // 是否是日常食材
+    category?: string; // 产品类别
   }[];
   warnings: string[]; // Red flags from the video
   credibilityScore: number; // 0-100, based on citations, expertise

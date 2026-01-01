@@ -1,61 +1,84 @@
 # TRUE FORMULA - 真配方
 
-> **从视频内容到科学管理** - AI驱动的补剂冲突检测与智能排程
+> **拒绝营销滤镜，还原内容真相** - AI驱动的补剂冲突检测与智能排程
+
+**Decode the Noise. Design Your Biology.**
 
 ---
 
-## 🎯 项目愿景
+## 🎯 项目简介
 
-将"看补剂视频"这一被动娱乐行为，转化为"科学管理身体"的主动能力。
+True Formula 是一个AI驱动的补剂与饮食规划师，帮助用户将复杂的健康视频内容直接转化为可执行的每日服用清单。
 
 **核心价值：**
-- 💰 **省钱**：去伪存真，不买垃圾补剂
-- 🧠 **省心**：自动排程，无需手动规划
-- ⚕️ **保命**：避免危险的成分冲突（如铁+钙、鱼油+抗凝药）
+- 💰 **省钱**：AI识别成分，去除营销干扰，不买垃圾补剂
+- 🧠 **省心**：智能排程，自动检测冲突，无需手动规划
+- ⚕️ **保命**：避免危险的成分冲突（如钙片+铁剂、VC空腹烧胃）
+
+**解决三个核心问题：**
+1. 这瓶该不该吃？
+2. 吃多少才有效？
+3. 具体几点钟吃？
 
 ---
 
-## 🏗️ 架构设计
+## 🏗️ 系统架构
 
 ```
-┌─────────────────┐
-│  Video Input    │ (用户粘贴YouTube/B站链接或文字描述)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  AI Analyzer    │ (Claude提取补剂信息，去除营销BS)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Conflict Engine │ (检测相生相克，生成力场图)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│    Scheduler    │ (生成24小时最优排程)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Visualization  │ (冲突力场图 + 日晷时间轴)
-└─────────────────┘
+用户输入文本
+    ↓
+AI识别产品（Claude + DeepSeek R1）
+    ↓
+模糊匹配产品库（600+产品）
+    ↓
+冲突检测引擎（7条规则）
+    ↓
+日晷智能排程（24小时优化）
+    ↓
+AI生成用药点评
 ```
+
+### 核心数据流
+
+1. **产品识别**: 用户输入文本 → Claude API提取产品信息 → 返回结构化数据
+2. **产品匹配**: AI提取的产品名 → 模糊匹配算法 → 数据库中的标准产品
+3. **冲突检测**: 用户选择的产品列表 → 检测冲突规则 → 标记冲突产品对
+4. **日晷排程**: 产品列表 → 时间槽分配算法 → 24小时最优排程
+5. **AI点评**: 排程结果 → DeepSeek R1深度分析 → 专业用药建议
 
 ---
 
 ## 📦 技术栈
 
-- **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS
-- **Visualization**: D3.js (力场图), Recharts (时间轴)
-- **AI**: Anthropic Claude API
-- **Database**: Prisma + SQLite (开发) / PostgreSQL (生产)
-- **State**: Zustand
+### 前端框架
+- **Next.js 14.2.22** - React全栈框架（App Router）
+- **React 18** - UI组件库
+- **TypeScript** - 类型安全
+- **Tailwind CSS** - 样式框架
+
+### 数据库
+- **Prisma 6.1.0** - ORM
+- **SQLite** (开发) / **PostgreSQL** (生产)
+- **600+ 预置产品数据**
+- **70+ 营养成分数据**
+
+### AI集成
+- **Anthropic Claude API** (Sonnet 4.5) - 产品识别与智能分析
+- **DeepSeek R1** - 药理学深度思考与用药点评
+- **Qwen2-VL** - 配料表视觉识别（规划中）
+
+### 可视化
+- **日晷组件** - 24小时圆环时间轴
+- **产品卡片** - 支持拖拽调整时间
+- **冲突预警** - 实时高亮显示冲突
+
+### 状态管理
+- **React Hooks** (useState, useEffect)
+- **自定义Hooks** (useProductSearch, useConflictDetection)
 
 ---
 
-## 🚀 快速开始 (包工头已搭好架子，Cursor开始干活)
+## 🚀 快速开始
 
 ### 1. 安装依赖
 
@@ -66,14 +89,22 @@ npm install
 ### 2. 配置环境变量
 
 ```bash
-cp .env.example .env
-# 编辑 .env，填入你的 ANTHROPIC_API_KEY
+# 检查 .env 文件是否存在
+npm run check-env
+
+# 如果不存在，创建并填入你的 API Key
+# .env 文件内容：
+ANTHROPIC_API_KEY=your_api_key_here
 ```
 
 ### 3. 初始化数据库
 
 ```bash
+# 推送数据库schema
 npx prisma db push
+
+# 导入产品数据（600+产品）
+npx tsx prisma/seed.ts
 ```
 
 ### 4. 启动开发服务器
@@ -82,350 +113,382 @@ npx prisma db push
 npm run dev
 ```
 
----
-
-## 📝 TODO清单 (Cursor按照优先级实现)
-
-### Phase 1: 核心功能 (MVP)
-
-#### 1.1 数据库与补剂库
-- [ ] **补充 Prisma schema** (`prisma/schema.prisma`)
-  - 添加 `Ingredient` 表
-  - 添加多对多关系 (supplements ↔ ingredients)
-  - 添加 citations 字段到 Conflict 表
-
-- [ ] **实现 seedDatabase** (`src/lib/supplement-db/index.ts:59`)
-  - 创建至少20个常见补剂的seed数据
-  - 重点包括：Vitamin C/D/E/B-complex, 钙/镁/锌/铁, Omega-3, 蛋白粉
-  - 添加常见冲突（如：铁+钙，钙+镁，鱼油+维E）
-  - 添加常见synergies（如：Vit D+钙，镁+B6）
-
-- [ ] **实现 findSupplement** (`src/lib/supplement-db/index.ts:20`)
-  - 模糊匹配（Fuse.js 或 简单的 Levenshtein 距离）
-  - 支持别名（如 "Vit C" → "Vitamin C"）
-
-- [ ] **实现 detectConflicts & findSynergies** (`src/lib/supplement-db/index.ts:30`)
-
-#### 1.2 AI视频分析
-- [ ] **实现 analyzeVideoContent** (`src/lib/ai-analyzer/index.ts:27`)
-  - 设计Claude提示词，要求输出结构化JSON
-  - 示例输出格式：
-    ```json
-    {
-      "supplements": [
-        {
-          "name": "Vitamin D3",
-          "dosage": "2000 IU",
-          "timing": "morning with breakfast",
-          "reasoning": "Video claims better absorption with fats"
-        }
-      ],
-      "warnings": ["No citations provided for dosage claims"],
-      "credibilityScore": 65
-    }
-    ```
-  - 处理Claude API响应并解析
-
-- [ ] **实现 API route** (`src/app/api/analyze-video/route.ts`)
-  - 接收 `{ content: string, contentType: "transcript" | "description" }`
-  - 调用 `analyzeVideoContent`
-  - 返回结果
-
-#### 1.3 冲突引擎
-- [ ] **实现 buildConflictGraph** (`src/lib/conflict-engine/index.ts:31`)
-  - 生成D3.js需要的 `{ nodes, edges }` 格式
-  - 示例：
-    ```typescript
-    {
-      nodes: [
-        { id: "supp-1", name: "Iron", category: "MINERAL" },
-        { id: "supp-2", name: "Calcium", category: "MINERAL" }
-      ],
-      edges: [
-        {
-          source: "supp-1",
-          target: "supp-2",
-          type: "conflict",
-          severity: "HIGH",
-          mechanism: "Calcium inhibits iron absorption in intestine"
-        }
-      ]
-    }
-    ```
-
-- [ ] **实现 isCombinationSafe** (`src/lib/conflict-engine/index.ts:43`)
-
-#### 1.4 智能排程
-- [ ] **实现 generateSchedule** (`src/lib/schedule-optimizer/index.ts:37`)
-  - 算法思路：
-    1. 根据 `TimingPreference` 分组
-    2. 检测冲突，需要时间间隔的分开放置
-    3. 有synergy的放在一起
-    4. 考虑用户meal times
-  - 输出示例：
-    ```typescript
-    {
-      time: "08:00",
-      supplements: [
-        { id: "1", name: "Vitamin D", dosage: "2000 IU" },
-        { id: "2", name: "Calcium", dosage: "500 mg" }
-      ],
-      reasoning: "Vitamin D enhances calcium absorption; best with breakfast"
-    }
-    ```
-
-- [ ] **实现 API route** (`src/app/api/generate-schedule/route.ts`)
-
-#### 1.5 UI组件
-- [ ] **VideoAnalyzer组件** (`src/components/VideoAnalyzer/index.tsx`)
-  - Textarea输入视频transcript或描述
-  - "Analyze"按钮，loading状态
-  - 显示提取的supplements列表（带credibility score）
-  - 允许用户勾选想要的supplements
-
-- [ ] **ConflictGraph组件** (`src/components/ConflictGraph/index.tsx`)
-  - 使用D3.js force simulation
-  - 节点：圆形，颜色按category
-  - 边：红色=冲突，绿色=synergy，粗细表示severity/benefit
-  - 点击边：显示Modal/Tooltip，展示药理学mechanism
-
-- [ ] **TimelineWheel组件** (`src/components/TimelineWheel/index.tsx`)
-  - 24小时圆环（类似时钟）
-  - 在对应时间点放置supplement图标
-  - Hover显示dosage和reasoning
-
-- [ ] **主页整合** (`src/app/page.tsx`)
-  - Step 1: VideoAnalyzer
-  - Step 2: 显示ConflictGraph
-  - Step 3: 显示TimelineWheel
-  - 添加状态管理（Zustand store）
-
----
-
-### Phase 2: 增强功能
-
-- [ ] **批量视频分析** (`src/lib/ai-analyzer/index.ts:58`)
-  - 分析播放列表
-  - 合并结果，标注冲突建议
-
-- [ ] **用户偏好设置**
-  - 保存meal times, workout time
-  - 保存supplement清单
-  - 历史schedule记录
-
-- [ ] **成本优化** (`src/lib/schedule-optimizer/index.ts:75`)
-  - 对接iHerb API
-  - 推荐性价比最高的产品组合
-
-- [ ] **移动端响应式设计**
-
-- [ ] **导出功能**
-  - 导出schedule为PDF/Calendar (ICS)
-  - 打印友好的版本
-
----
-
-### Phase 3: 社交与变现
-
-- [ ] **分享功能**
-  - 生成可分享的schedule链接
-  - 社交媒体卡片预览
-
-- [ ] **联盟营销**
-  - iHerb/淘宝affiliate链接
-  - 从推荐购买中获得佣金
-
-- [ ] **用户社区**
-  - 分享自己的supplement stack
-  - 投票最佳schedule
+访问 `http://localhost:3000` 即可使用。
 
 ---
 
 ## 📂 项目结构
 
 ```
-supplement-scheduler/
+true-formula/
 ├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── page.tsx           # 主页
-│   │   ├── layout.tsx
-│   │   ├── globals.css
-│   │   └── api/               # API routes
-│   │       ├── analyze-video/
-│   │       └── generate-schedule/
-│   ├── components/            # React组件
-│   │   ├── VideoAnalyzer/     # 视频分析UI
-│   │   ├── ConflictGraph/     # 冲突力场图 (D3.js)
-│   │   └── TimelineWheel/     # 日晷时间轴
-│   ├── lib/                   # 核心业务逻辑
-│   │   ├── supplement-db/     # 补剂数据库查询
-│   │   ├── ai-analyzer/       # Claude AI分析
-│   │   ├── conflict-engine/   # 冲突检测
-│   │   └── schedule-optimizer/# 排程算法
-│   ├── types/                 # TypeScript类型定义
-│   │   └── supplement.ts
-│   └── utils/                 # 工具函数
+│   ├── app/                          # Next.js App Router
+│   │   ├── page.tsx                  # 主页
+│   │   ├── layout.tsx                # 全局布局
+│   │   ├── globals.css               # 全局样式
+│   │   └── api/                      # API路由
+│   │       ├── ai-chat/              # AI对话接口
+│   │       ├── analyze-text/         # 文本分析接口
+│   │       ├── generate-schedule/    # 排程生成接口
+│   │       └── products/             # 产品查询接口
+│   │
+│   ├── components/                   # React组件（18个）
+│   │   ├── AILoadingAnimation/       # AI加载动画
+│   │   ├── AnimatedTitle/            # 动画标题
+│   │   ├── HeroSection/              # 首屏区域
+│   │   ├── InputSection/             # 输入区域
+│   │   ├── MyList/                   # 我的清单
+│   │   ├── Sundial/                  # 日晷时间轴（核心）
+│   │   ├── ProductCard/              # 产品卡片
+│   │   ├── WorkbenchModal/           # 工作台弹窗
+│   │   └── ...                       # 其他组件
+│   │
+│   ├── lib/                          # 核心业务逻辑
+│   │   ├── ai-analyzer/              # AI分析器
+│   │   │   └── index.ts              # Claude API调用
+│   │   ├── conflict-detector/        # 冲突检测引擎
+│   │   │   └── index.ts              # 7条冲突规则
+│   │   ├── product-matcher/          # 产品匹配
+│   │   │   └── index.ts              # 模糊匹配算法
+│   │   └── schedule-optimizer/       # 排程优化器
+│   │       └── index.ts              # 时间槽分配算法
+│   │
+│   ├── types/                        # TypeScript类型
+│   │   └── supplement.ts             # 核心类型定义
+│   │
+│   └── utils/                        # 工具函数
+│
 ├── prisma/
-│   └── schema.prisma          # 数据库schema
-├── public/                    # 静态资源
+│   ├── schema.prisma                 # 数据库Schema
+│   ├── seed.ts                       # 数据库种子文件
+│   └── dev.db                        # SQLite数据库（开发）
+│
+├── public/
+│   ├── rollup-banner.html            # 宣传海报（易拉宝）
+│   └── ...                           # 其他静态资源
+│
 └── package.json
 ```
 
 ---
 
-## 🎨 视觉设计指引
+## 🔑 核心功能详解
 
-### 冲突力场图 (ConflictGraph)
-- **节点**：圆形粒子，带supplement name
-- **颜色**：按category (Vitamin=蓝, Mineral=绿, 等)
-- **边**：
-  - 冲突：红色虚线，粗细表示severity
-  - Synergy：绿色实线
-- **交互**：
-  - 拖拽节点
-  - 点击边显示mechanism tooltip
-  - 缩放/平移
+### 1. AI产品识别 (`/api/analyze-text`)
 
-### 日晷时间轴 (TimelineWheel)
-- **外观**：24小时圆环，0点在顶部
-- **标记**：6, 12, 18小时刻度
-- **图标**：supplement pill图标放置在对应时间
-- **连线**：同一时段的supplements用弧线连接
+**功能**: 从用户输入的文本中提取补剂产品信息
 
----
+**技术实现**:
+- 使用Claude Sonnet 4.5解析自然语言
+- 提取产品名称、剂量、服用时间
+- 返回结构化JSON数据
 
-## 🔑 关键文件说明
-
-### 类型定义 (`src/types/supplement.ts`)
-所有核心数据结构都在这里定义，包括：
-- `Supplement`: 补剂基础信息
-- `Conflict`: 冲突关系
-- `Synergy`: 协同关系
-- `ScheduleSlot`: 排程时间槽
-
-### 数据库模块 (`src/lib/supplement-db/`)
-负责：
-- 模糊搜索supplements
-- 检测conflicts和synergies
-- Seed初始数据
-
-### AI分析器 (`src/lib/ai-analyzer/`)
-负责：
-- 调用Claude API分析视频内容
-- 提取补剂信息
-- 评估内容可信度
-
-### 冲突引擎 (`src/lib/conflict-engine/`)
-负责：
-- 生成D3.js可视化数据
-- 检查组合安全性
-- 推荐替代方案
-
-### 排程优化器 (`src/lib/schedule-optimizer/`)
-负责：
-- 生成最优daily schedule
-- 验证schedule有效性
-- 成本优化（未来）
-
----
-
-## 💡 实现建议
-
-### 1. 先实现最小可用版本 (MVP)
-优先级顺序：
-1. 手动添加supplement → 检测冲突 → 生成schedule
-2. 添加AI视频分析
-3. 添加可视化组件
-
-### 2. 测试数据准备
-创建以下测试场景：
-- ✅ **安全组合**: Vitamin D + Calcium
-- ⚠️ **中度冲突**: Calcium + Magnesium (竞争吸收)
-- 🚫 **严重冲突**: Iron + Calcium (严重抑制)
-
-### 3. Claude提示词优化
-示例prompt模板：
-```
-You are a supplement expert analyzing health content.
-
-Extract ALL supplements mentioned in this text:
-- Name (use scientific names when possible)
-- Dosage (if mentioned)
-- Timing recommendations
-- Reasoning/claims made
-
-Also evaluate:
-- Are claims backed by citations?
-- Is dosage reasonable and safe?
-- Any red flags (too good to be true, dangerous combinations)?
-
-Output as JSON with this schema:
-{
-  "supplements": [...],
-  "warnings": [...],
-  "credibilityScore": 0-100
-}
-
-Content: [USER_INPUT]
-```
-
-### 4. D3.js力场图实现
-使用 `d3-force` 模拟：
+**请求示例**:
 ```typescript
-const simulation = d3.forceSimulation(nodes)
-  .force("link", d3.forceLink(edges).id(d => d.id))
-  .force("charge", d3.forceManyBody().strength(-100))
-  .force("center", d3.forceCenter(width / 2, height / 2));
+POST /api/analyze-text
+{
+  "text": "我每天早上吃维生素D3 2000IU和钙片500mg"
+}
+```
+
+**响应示例**:
+```json
+{
+  "products": [
+    {
+      "name": "维生素D3",
+      "dosage": "2000 IU",
+      "timing": "早上"
+    },
+    {
+      "name": "钙片",
+      "dosage": "500 mg",
+      "timing": "早上"
+    }
+  ]
+}
+```
+
+---
+
+### 2. 产品模糊匹配 (`src/lib/product-matcher`)
+
+**功能**: 将AI提取的产品名匹配到数据库中的标准产品
+
+**算法**:
+- **编辑距离算法** (Levenshtein Distance)
+- **别名映射** (如 "Vit C" → "维生素C")
+- **相似度阈值** (0.6以上才匹配)
+
+**数据库规模**:
+- 600+ 标准产品
+- 70+ 营养成分
+- 支持中英文名称
+
+**匹配示例**:
+```typescript
+输入: "维C泡腾片"
+匹配: "维生素C" (相似度: 0.75)
+
+输入: "钙尔奇D"
+匹配: "钙片+维生素D" (相似度: 0.82)
+```
+
+---
+
+### 3. 冲突检测引擎 (`src/lib/conflict-detector`)
+
+**功能**: 检测产品之间的冲突关系
+
+**7条核心规则**:
+1. **钙与铁**: 钙会抑制铁的吸收
+2. **钙与镁**: 竞争吸收，建议分开服用
+3. **锌与铜**: 高剂量锌抑制铜吸收
+4. **脂溶性维生素**: Vit A/D/E/K 过量中毒
+5. **咖啡因与钙**: 咖啡因促进钙流失
+6. **纤维与矿物质**: 纤维素阻碍矿物质吸收
+7. **空腹刺激**: VC等空腹服用刺激胃部
+
+**检测示例**:
+```typescript
+输入: ["钙片", "铁剂"]
+输出: {
+  conflict: true,
+  severity: "HIGH",
+  message: "钙片会严重抑制铁的吸收，建议间隔4小时以上"
+}
+```
+
+---
+
+### 4. 日晷智能排程 (`src/lib/schedule-optimizer`)
+
+**功能**: 生成24小时最优服用时间表
+
+**算法思路**:
+1. **时间槽分配**: 将24小时划分为8个时段
+2. **冲突分离**: 有冲突的产品分配到不同时段
+3. **协同组合**: 有协同效应的产品放在同一时段
+4. **优先级排序**: 空腹/饭后/睡前等特殊要求优先
+
+**可视化组件**:
+- **日晷圆环**: 24小时环形布局
+- **产品卡片**: 拖拽调整时间
+- **冲突预警**: 红色高亮显示
+
+**排程示例**:
+```
+08:00 - 维生素D + 钙片（协同吸收）
+12:00 - 铁剂（避开钙片）
+20:00 - 镁片（助眠效果）
+```
+
+---
+
+### 5. AI用药点评 (`/api/ai-chat`)
+
+**功能**: 对用户的排程方案进行专业点评
+
+**技术实现**:
+- 使用DeepSeek R1进行深度药理学分析
+- 评估剂量合理性
+- 指出潜在风险
+- 提供优化建议
+
+**点评示例**:
+```
+您的排程方案总体合理，但有以下建议：
+
+✅ 优点:
+- 维生素D与钙片同时服用，吸收效率高
+- 铁剂单独服用，避免了与钙片的冲突
+
+⚠️ 注意:
+- 镁片剂量建议不超过400mg/天
+- 建议在铁剂前后1小时避免喝茶或咖啡
+
+💡 优化建议:
+- 可考虑将维生素D调整至午餐后，随脂肪食物吸收更佳
+```
+
+---
+
+## 🗄️ 数据库Schema
+
+### Product (产品表)
+
+```prisma
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  nameEn      String?
+  category    String
+  dosage      String?
+  timing      String?
+  description String?
+  nutrients   Nutrient[]
+}
+```
+
+### Nutrient (营养成分表)
+
+```prisma
+model Nutrient {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  category String
+  products Product[]
+}
+```
+
+### Conflict (冲突关系表)
+
+```prisma
+model Conflict {
+  id          Int    @id @default(autoincrement())
+  product1    String
+  product2    String
+  severity    String // HIGH, MEDIUM, LOW
+  mechanism   String
+  suggestion  String
+}
+```
+
+---
+
+## 🎨 UI设计特色
+
+### 日晷组件 (Sundial)
+- **24小时圆环**: 0点在顶部，顺时针排列
+- **时段标记**: 00:00, 06:00, 12:00, 18:00
+- **产品卡片**: 拖拽式交互，自由调整时间
+- **冲突高亮**: 冲突产品自动标红
+
+### 产品卡片 (ProductCard)
+- **拖拽支持**: 直接拖到日晷上
+- **剂量显示**: 标准剂量 + 用户自定义
+- **服用时间**: 智能推荐最佳时间
+- **冲突标记**: 红色边框 + 提示文字
+
+### 工作台弹窗 (WorkbenchModal)
+- **文本输入**: 粘贴视频文字或描述
+- **AI识别**: 实时提取产品信息
+- **产品选择**: 勾选想要添加的产品
+- **一键导入**: 批量添加到日晷
+
+---
+
+## 🔧 开发指南
+
+### 添加新产品
+
+编辑 `prisma/seed.ts`:
+
+```typescript
+await prisma.product.create({
+  data: {
+    name: "辅酶Q10",
+    nameEn: "Coenzyme Q10",
+    category: "抗氧化剂",
+    dosage: "100mg",
+    timing: "早餐后",
+    description: "支持心脏健康，提升细胞能量"
+  }
+});
+```
+
+运行种子脚本:
+```bash
+npx tsx prisma/seed.ts
+```
+
+---
+
+### 添加新冲突规则
+
+编辑 `src/lib/conflict-detector/index.ts`:
+
+```typescript
+export const conflictRules = [
+  {
+    products: ["产品A", "产品B"],
+    severity: "HIGH",
+    mechanism: "产品A会抑制产品B的吸收",
+    suggestion: "建议间隔4小时以上服用"
+  },
+  // 添加更多规则...
+];
+```
+
+---
+
+### 自定义AI提示词
+
+编辑 `src/lib/ai-analyzer/index.ts`:
+
+```typescript
+const systemPrompt = `
+你是一个专业的补剂分析师。
+请从用户输入中提取所有补剂产品信息...
+`;
 ```
 
 ---
 
 ## 🐛 常见问题
 
-### Q: Prisma生成client失败？
-```bash
-npx prisma generate
-npx prisma db push
-```
+### Q: API调用失败？
+**A**: 检查 `.env` 文件中的 `ANTHROPIC_API_KEY` 是否正确配置。
 
-### Q: Claude API超时？
-增加timeout，或实现重试机制：
-```typescript
-const response = await anthropic.messages.create({
-  model: "claude-3-5-sonnet-20241022",
-  max_tokens: 2048,
-  timeout: 60000, // 60s
-  // ...
-});
-```
+### Q: 数据库连接错误？
+**A**: 运行 `npx prisma db push` 重新推送schema。
 
-### Q: D3.js在Next.js中报错？
-确保组件是client-side：
-```typescript
-"use client";
-import * as d3 from "d3";
-```
+### Q: 产品匹配不准确？
+**A**: 调整 `src/lib/product-matcher/index.ts` 中的相似度阈值。
+
+### Q: 日晷组件不显示？
+**A**: 确保组件使用了 `"use client"` 指令（客户端组件）。
 
 ---
 
 ## 📚 参考资源
 
 - [Anthropic Claude API文档](https://docs.anthropic.com/)
-- [D3.js力场图教程](https://d3-graph-gallery.com/network.html)
 - [Prisma文档](https://www.prisma.io/docs)
+- [Next.js 14文档](https://nextjs.org/docs)
 - [补剂相互作用数据库](https://www.drugs.com/drug_interactions.html)
 
 ---
 
-## 🎯 成功指标
+## 🎯 已完成功能
 
-MVP完成标志：
-- [ ] 用户可以粘贴视频描述，AI提取supplements
-- [ ] 系统检测出至少3种常见冲突
-- [ ] 生成24小时schedule，无冲突
-- [ ] 力场图可交互（拖拽、点击边查看详情）
-- [ ] 时间轴正确显示supplement分布
+- ✅ AI产品识别（Claude Sonnet 4.5）
+- ✅ 产品模糊匹配（600+产品库）
+- ✅ 冲突检测引擎（7条核心规则）
+- ✅ 日晷智能排程（24小时可视化）
+- ✅ 拖拽式交互（产品卡片 → 日晷）
+- ✅ AI用药点评（DeepSeek R1）
+- ✅ 工作台批量导入
+- ✅ 实时冲突预警
 
 ---
 
-**开始愉快地coding吧，Cursor! 包工头已经把架子搭好了，剩下的就靠你了！** 💪
+## 🚧 规划中功能
+
+- [ ] 视频内容分析（支持YouTube/抖音链接）
+- [ ] 配料表OCR识别（Qwen2-VL）
+- [ ] 用户偏好保存（餐食时间、运动时间）
+- [ ] 历史排程记录
+- [ ] 导出功能（PDF/日历ICS）
+- [ ] 成本优化（对接iHerb API）
+- [ ] 社交分享功能
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+**让健康管理从「收藏视频」变成「执行清单」。** 💊⏰

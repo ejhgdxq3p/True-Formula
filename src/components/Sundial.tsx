@@ -18,12 +18,18 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
     id: "sundial-drop-zone",
   });
 
+  const [hoveredProduct, setHoveredProduct] = React.useState<{
+    product: any;
+    x: number;
+    y: number;
+  } | null>(null);
+
   const SIZE = 500;
   const CENTER = SIZE / 2;
   const RADIUS = 180;
 
   return (
-    <div className="retro-border p-6 bg-white h-full flex flex-col">
+    <div className="retro-border p-6 bg-white h-full flex flex-col overflow-y-auto">
       {/* 标题 */}
       <div className="bg-retro-black text-retro-yellow p-3 mb-6 text-center border-3 border-retro-yellow">
         <h2 className="font-black text-xl font-mono uppercase flex items-center justify-center gap-3">
@@ -39,7 +45,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
       </div>
 
       {/* 日晷可视化区域 */}
-      <div className="bg-retro-green/5 border-3 border-retro-green p-6 flex items-center justify-center min-h-[500px] relative">
+      <div className="bg-retro-green/5 border-3 border-retro-green p-6 flex items-center justify-center min-h-[450px] relative">
         {isOptimizing ? (
           /* AI 流星雨动画（占据整个日晷区域）*/
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white">
@@ -135,7 +141,12 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
                 const y = CENTER + r * Math.sin(angle);
 
                 return (
-                  <g key={`${slot.time}-${p.productId}`}>
+                  <g
+                    key={`${slot.time}-${p.productId}`}
+                    onMouseEnter={() => setHoveredProduct({ product: p, x, y })}
+                    onMouseLeave={() => setHoveredProduct(null)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     {/* 连线 */}
                     <line
                       x1={CENTER}
@@ -203,20 +214,89 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
             </div>
           </div>
         )}
+
+        {/* 产品信息 Tooltip */}
+        {hoveredProduct && (
+          <div
+            className="absolute bg-white border-4 border-retro-black p-4 shadow-hard z-50 w-72"
+            style={{
+              left: `${hoveredProduct.x > SIZE / 2 ? hoveredProduct.x - 280 : hoveredProduct.x + 50}px`,
+              top: `${hoveredProduct.y}px`,
+              pointerEvents: 'none',
+            }}
+          >
+            {/* 产品名称 */}
+            <div className="font-black text-sm font-mono text-retro-black mb-1 uppercase border-b-2 border-retro-yellow pb-1">
+              {hoveredProduct.product.product.name}
+            </div>
+
+            {/* 品牌 */}
+            <div className="text-xs font-mono text-retro-black/60 mb-2">
+              {hoveredProduct.product.product.brand}
+            </div>
+
+            {/* 用量 */}
+            <div className="bg-retro-green/10 border-2 border-retro-green px-2 py-1 mb-2">
+              <span className="text-xs font-mono font-bold text-retro-black">
+                {language === 'zh' ? '用量' : 'DOSAGE'}: {hoveredProduct.product.dosage || hoveredProduct.product.product.dosagePerServing}
+              </span>
+            </div>
+
+            {/* 成分 */}
+            {hoveredProduct.product.product.ingredients && hoveredProduct.product.product.ingredients.length > 0 && (
+              <div className="mb-2">
+                <div className="text-xs font-mono font-bold text-retro-black mb-1">
+                  {language === 'zh' ? '主要成分' : 'INGREDIENTS'}:
+                </div>
+                <div className="space-y-1">
+                  {hoveredProduct.product.product.ingredients.slice(0, 5).map((ing: any, idx: number) => (
+                    <div key={idx} className="text-xs font-mono text-retro-black/70 flex justify-between">
+                      <span>{ing.nutrient.commonName || ing.nutrient.name}</span>
+                      <span className="font-bold text-retro-green">
+                        {ing.amount}{ing.unit}
+                      </span>
+                    </div>
+                  ))}
+                  {hoveredProduct.product.product.ingredients.length > 5 && (
+                    <div className="text-xs font-mono text-retro-black/50">
+                      +{hoveredProduct.product.product.ingredients.length - 5} {language === 'zh' ? '更多' : 'more'}...
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* 推荐时间 */}
+            <div className="bg-retro-yellow/20 border-2 border-retro-yellow px-2 py-1 text-xs font-mono">
+              <span className="font-bold">{language === 'zh' ? '推荐时间' : 'TIMING'}:</span>{' '}
+              <span className="text-retro-black/70">
+                {hoveredProduct.product.product.optimalTiming === 'MORNING' && (language === 'zh' ? '早晨' : 'Morning')}
+                {hoveredProduct.product.product.optimalTiming === 'AFTERNOON' && (language === 'zh' ? '下午' : 'Afternoon')}
+                {hoveredProduct.product.product.optimalTiming === 'EVENING' && (language === 'zh' ? '傍晚' : 'Evening')}
+                {hoveredProduct.product.product.optimalTiming === 'POST_WORKOUT' && (language === 'zh' ? '运动后' : 'Post-Workout')}
+                {hoveredProduct.product.product.optimalTiming === 'BEFORE_BED' && (language === 'zh' ? '睡前' : 'Before Bed')}
+                {hoveredProduct.product.product.optimalTiming === 'WITH_FOOD' && (language === 'zh' ? '随餐' : 'With Food')}
+                {hoveredProduct.product.product.optimalTiming === 'EMPTY_STOMACH' && (language === 'zh' ? '空腹' : 'Empty Stomach')}
+                {hoveredProduct.product.product.optimalTiming === 'ANYTIME' && (language === 'zh' ? '任何时间' : 'Anytime')}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* AI 毒舌点评（替代 timeline）*/}
       {sundial && sundial.timeSlots.length > 0 && (
-        <div className="bg-retro-yellow/20 border-3 border-retro-yellow p-4 mt-6">
+        <div className="bg-retro-yellow/20 border-3 border-retro-yellow p-4 mt-6 flex-shrink-0">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xl">🤖</span>
             <h3 className="font-black text-sm font-mono uppercase text-retro-black">
               {language === 'zh' ? 'AI 毒舌点评' : 'AI ROAST'}
             </h3>
           </div>
-          <p className="text-sm font-mono text-retro-black leading-relaxed">
-            {generateAIRoast(sundial, language)}
-          </p>
+          <div className="max-h-32 overflow-y-auto pr-2">
+            <p className="text-sm font-mono text-retro-black leading-relaxed whitespace-pre-wrap">
+              {sundial.aiCommentary || generateAIRoast(sundial, language)}
+            </p>
+          </div>
 
           {/* 统计信息 */}
           <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t-2 border-retro-yellow text-center text-xs font-mono">

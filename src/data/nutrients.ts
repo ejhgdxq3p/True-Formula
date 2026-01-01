@@ -72,6 +72,15 @@ export const NUTRIENTS_DATABASE: Nutrient[] = [
   { id: "lacto-acidophilus", name: "嗜酸乳杆菌", commonName: "嗜酸乳杆菌", category: "PROBIOTIC_STRAIN" as any, aliases: ["Lactobacillus Acidophilus"] },
   { id: "bifido-bifidum", name: "双歧杆菌", commonName: "双歧杆菌", category: "PROBIOTIC_STRAIN" as any, aliases: ["Bifidobacterium Bifidum"] },
 
+  // === 蛋白质 ===
+  {
+    id: "protein",
+    name: "蛋白质",
+    commonName: "蛋白质",
+    category: "ESSENTIAL_AMINO" as any,
+    aliases: ["Protein", "蛋白", "Whey Protein", "乳清蛋白"]
+  },
+
   // === 其他 (如咖啡因、单宁酸) ===
   {
     id: "caffeine",
