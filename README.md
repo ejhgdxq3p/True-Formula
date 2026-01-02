@@ -4,6 +4,12 @@
 
 **Decode the Noise. Design Your Biology.**
 
+## 🌐 在线体验
+
+**🚀 立即访问: [https://true-formula.vercel.app/](https://true-formula.vercel.app/)**
+
+无需安装，浏览器直接使用！
+
 ---
 
 ## 🎯 项目简介
@@ -27,7 +33,7 @@ True Formula 是一个AI驱动的补剂与饮食规划师，帮助用户将复�
 ```
 用户输入文本
     ↓
-AI识别产品（Claude + DeepSeek R1）
+AI识别产品（DeepSeek V3.2-Fast ⚡ 或 Claude）
     ↓
 模糊匹配产品库（600+产品）
     ↓
@@ -35,7 +41,7 @@ AI识别产品（Claude + DeepSeek R1）
     ↓
 日晷智能排程（24小时优化）
     ↓
-AI生成用药点评
+AI生成用药点评（DeepSeek R1）
 ```
 
 ### 核心数据流
@@ -64,7 +70,8 @@ AI生成用药点评
 
 ### AI集成
 - **Anthropic Claude API** (Sonnet 4.5) - 产品识别与智能分析
-- **DeepSeek R1** - 药理学深度思考与用药点评
+- **DeepSeek V3.2-Fast** - 快速文本分析与产品提取 ⚡
+- **DeepSeek R1** - 药理学深度思考与用药点评（可切换）
 - **Qwen2-VL** - 配料表视觉识别（规划中）
 
 ### 可视化
@@ -80,6 +87,10 @@ AI生成用药点评
 
 ## 🚀 快速开始
 
+> **💡 提示**: 不想本地搭建？直接访问在线版本 👉 [https://true-formula.vercel.app/](https://true-formula.vercel.app/)
+
+### 本地部署步骤
+
 ### 1. 安装依赖
 
 ```bash
@@ -89,13 +100,26 @@ npm install
 ### 2. 配置环境变量
 
 ```bash
-# 检查 .env 文件是否存在
-npm run check-env
+# 创建 .env 文件，配置AI API密钥
+cp .env.example .env
 
-# 如果不存在，创建并填入你的 API Key
-# .env 文件内容：
-ANTHROPIC_API_KEY=your_api_key_here
+# 编辑 .env 文件内容：
+# Claude API（可选）
+ANTHROPIC_API_KEY=your_claude_api_key_here
+
+# DeepSeek API（推荐，更快更便宜）⚡
+DEEPSEEK_API_KEY=your_deepseek_api_key_here
+DEEPSEEK_BASE_URL=https://www.sophnet.com/api/open-apis/v1
+DEEPSEEK_MODEL=DeepSeek-V3.2-Fast
+
+# AI Provider 选择（claude 或 deepseek）
+AI_PROVIDER=deepseek
 ```
+
+> **💡 提示**:
+> - DeepSeek V3.2-Fast 速度快、成本低，推荐使用
+> - Claude Sonnet 4.5 分析更深入，适合复杂场景
+> - 可随时在 `.env` 中切换 `AI_PROVIDER`
 
 ### 3. 初始化数据库
 
@@ -462,14 +486,16 @@ const systemPrompt = `
 
 ## 🎯 已完成功能
 
-- ✅ AI产品识别（Claude Sonnet 4.5）
+- ✅ 双AI支持（DeepSeek V3.2-Fast ⚡ + Claude Sonnet 4.5）
+- ✅ AI产品识别（文本分析与食材提取）
 - ✅ 产品模糊匹配（600+产品库）
 - ✅ 冲突检测引擎（7条核心规则）
 - ✅ 日晷智能排程（24小时可视化）
 - ✅ 拖拽式交互（产品卡片 → 日晷）
-- ✅ AI用药点评（DeepSeek R1）
+- ✅ AI用药点评（DeepSeek R1深度分析）
 - ✅ 工作台批量导入
 - ✅ 实时冲突预警
+- ✅ Vercel云端部署
 
 ---
 

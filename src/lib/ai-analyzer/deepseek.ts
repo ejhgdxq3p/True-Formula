@@ -1,90 +1,98 @@
 /**
  * DeepSeek AI Analyzer Module
  *
- * Purpose: Extract supplement information using DeepSeek R1 model
- * Provider: SophNet (OpenAI-compatible API)
+ * Purpose: Extract supplement information using DeepSeek model
+ * Provider: SophNet
  */
 
-import OpenAI from "openai";
 import type { VideoAnalysisResult } from "@/types/supplement";
 
 /**
- * Analyze video content using DeepSeek R1
+ * Analyze video content using DeepSeek
  */
 export async function analyzeWithDeepSeek(
   content: string,
   contentType: "transcript" | "description"
 ): Promise<VideoAnalysisResult> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  const baseURL = process.env.DEEPSEEK_BASE_URL;
-  const model = process.env.DEEPSEEK_MODEL || "DeepSeek-R1";
+  const apiKey = process.env.DEEPSEEK_API_KEY?.trim();
+  const baseURL = process.env.DEEPSEEK_BASE_URL?.trim();
+  const model = (process.env.DEEPSEEK_MODEL || "DeepSeek-V3.2-Fast").trim();
 
-  if (!apiKey) {
-    throw new Error("DEEPSEEK_API_KEY is not configured in environment variables");
+  if (!apiKey || !baseURL) {
+    throw new Error("DEEPSEEK_API_KEY or DEEPSEEK_BASE_URL is not configured in environment variables");
   }
 
-  // Initialize OpenAI client with DeepSeek configuration
-  const client = new OpenAI({
-    apiKey: apiKey,
-    baseURL: baseURL,
-  });
+  const prompt = `
+你是一位资深营养学家和药理学专家。分析以下内容，提取所有与健康相关的补剂和食材。
 
-  const systemPrompt = `你是一位专业的营养学家和药理学专家。你的任务是分析视频内容中的补剂信息，去除营销噱头，提取真实可靠的科学建议。`;
+重要规则：
+1. 识别所有提到的补剂（维生素、矿物质、蛋白粉等）
+2. 识别所有提到的日常食材（肉类、蔬菜、水果、蛋类、豆制品等）
+3. 只要提到健康特性、营养成分、食物相冲等信息，都要提取
+4. 不要卡得太严，有一点点健康相关就提取
+5. 如果没有明确品牌，标记为 "无品牌"
+6. 提取剂量、时间、原因（如果有）
+7. 标注食物之间的冲突或协同（如果提到）
 
-  const userPrompt = `
-分析以下视频${contentType === "transcript" ? "文稿" : "描述"}，提取补剂推荐信息：
-
-**任务要求：**
-1. 识别所有提到的补剂（使用标准化名称，如 "维生素D3"）
-2. 提取推荐剂量和服用时间（如果提到）
-3. 识别内容中给出的理由
-4. 检测任何警告、副作用或危险组合
-5. 评估内容可信度（0-100分）：
-   - 是否引用科学文献？（+20分）
-   - 是否正确解释生物学机制？（+20分）
-   - 是否存在夸大的营销宣传？（-30分）
-   - 剂量建议是否安全？（+20分）
-   - 是否提到潜在风险？（+20分）
-
-**输出格式（必须是纯JSON，不要有其他文字）：**
+输出纯JSON格式，不要额外文字：
 {
   "supplements": [
     {
-      "name": "标准化名称（如：维生素D3）",
-      "dosage": "剂量（如：2000 IU，如果未提到则为null）",
-      "timing": "服用时间（如：早上随脂肪摄入，如果未提到则为null）",
-      "reasoning": "推荐理由的简要说明"
+      "name": "标准名称（如：维生素D3 或 鸡蛋 或 西兰花）",
+      "brand": "品牌名（如果有）或 null",
+      "dosage": "剂量（如：2000 IU 或 每天1个 或 100g）或 null",
+      "timing": "时间（如：早晨空腹 或 饭后）或 null",
+      "reasoning": "推荐原因",
+      "isFood": true/false,
+      "category": "补剂类别或食材类别（如：SINGLE_VITAMIN, FOOD_EGG, FOOD_MEAT等）"
     }
   ],
-  "warnings": ["警告1", "警告2"],
-  "credibilityScore": 75
+  "warnings": ["警告1（如：不要和XX一起吃）"],
+  "credibilityScore": 0-100
 }
 
-**待分析内容：**
+内容：
 ${content}
 `;
 
   try {
-    const response = await client.chat.completions.create({
-      model: model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ],
-      temperature: 0.3, // Lower temperature for more consistent output
-      max_tokens: 4096,
+    console.log(`[DeepSeek分析] 调用API: ${baseURL}/chat/completions`);
+
+    const response = await fetch(`${baseURL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 4096,
+        temperature: 0.3
+      })
     });
 
-    const textContent = response.choices[0]?.message?.content || "";
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[DeepSeek分析] API错误 ${response.status}:`, errorText);
+      throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const textContent = data.choices?.[0]?.message?.content || "";
 
     // Extract JSON from response
     const jsonMatch = textContent.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("DeepSeek response:", textContent);
+      console.error("[DeepSeek分析] 未找到JSON，原始响应:", textContent.substring(0, 500));
       throw new Error("Failed to parse JSON from DeepSeek response");
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
+
+    console.log(`[DeepSeek分析] 成功解析，发现 ${parsed.supplements?.length || 0} 个补剂`);
 
     return {
       supplements: parsed.supplements || [],
@@ -93,7 +101,10 @@ ${content}
     };
 
   } catch (error) {
-    console.error("Error analyzing with DeepSeek:", error);
+    console.error("[DeepSeek分析] 错误:", error);
+    if (error instanceof Error) {
+      console.error("[DeepSeek分析] 错误详情:", error.message);
+    }
     throw new Error(
       "DeepSeek Analysis failed: " +
       (error instanceof Error ? error.message : String(error))

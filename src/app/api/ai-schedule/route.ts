@@ -50,7 +50,7 @@ async function generateAISchedule(
   conflicts: any[],
   language: 'zh' | 'en'
 ): Promise<any[]> {
-  const provider = process.env.AI_PROVIDER || 'claude';
+  const provider = (process.env.AI_PROVIDER || 'claude').toLowerCase().trim();
 
   if (provider === 'deepseek') {
     return generateAIScheduleWithDeepSeek(products, conflicts, language);
@@ -64,9 +64,9 @@ async function generateAIScheduleWithDeepSeek(
   conflicts: any[],
   language: 'zh' | 'en'
 ): Promise<any[]> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  const baseURL = process.env.DEEPSEEK_BASE_URL;
-  const model = process.env.DEEPSEEK_MODEL || 'DeepSeek-V3.2-Fast';
+  const apiKey = process.env.DEEPSEEK_API_KEY?.trim();
+  const baseURL = process.env.DEEPSEEK_BASE_URL?.trim();
+  const model = (process.env.DEEPSEEK_MODEL || 'DeepSeek-V3.2-Fast').trim();
 
   if (!apiKey || !baseURL) {
     console.error("DeepSeek配置缺失");

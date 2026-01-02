@@ -40,3 +40,5 @@ prisma/dev.db-journal
 # cursor prompts and notes
 CURSOR*.md
 *.txt
+
+.vercel

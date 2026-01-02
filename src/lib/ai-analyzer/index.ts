@@ -13,7 +13,7 @@ import { analyzeWithDeepSeek } from "./deepseek";
  * Get AI provider from environment variable
  */
 function getAIProvider(): "claude" | "deepseek" {
-  const provider = process.env.AI_PROVIDER?.toLowerCase();
+  const provider = process.env.AI_PROVIDER?.toLowerCase().trim();
   if (provider === "deepseek") return "deepseek";
   return "claude"; // Default to Claude
 }

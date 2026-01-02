@@ -27,7 +27,13 @@
       "Bash(else echo \".next目录不存在\")",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(vercel --version:*)",
+      "Bash(vercel)",
+      "Bash(vercel login)",
+      "Bash(vercel:*)",
+      "Bash(echo:*)",
+      "Bash(printf:*)"
     ]
   }
 }

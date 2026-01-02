@@ -152,7 +152,7 @@ export default function SundialDetailModal({
                 </h3>
               </div>
               <p className="text-sm font-mono text-retro-black leading-relaxed">
-                {sundial.aiRoast || generateAIRoast(sundial, language)}
+                {sundial.aiCommentary || generateAIRoast(sundial, language)}
               </p>
             </div>
 

@@ -46,7 +46,7 @@ async function generateAICommentary(
   },
   language: 'zh' | 'en'
 ): Promise<string> {
-  const provider = process.env.AI_PROVIDER || 'claude';
+  const provider = (process.env.AI_PROVIDER || 'claude').toLowerCase().trim();
 
   if (provider === 'deepseek') {
     return generateCommentaryWithDeepSeek(sundial, language);
@@ -63,9 +63,9 @@ async function generateCommentaryWithDeepSeek(
   },
   language: 'zh' | 'en'
 ): Promise<string> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  const baseURL = process.env.DEEPSEEK_BASE_URL;
-  const model = process.env.DEEPSEEK_MODEL || 'DeepSeek-V3.2-Fast';
+  const apiKey = process.env.DEEPSEEK_API_KEY?.trim();
+  const baseURL = process.env.DEEPSEEK_BASE_URL?.trim();
+  const model = (process.env.DEEPSEEK_MODEL || 'DeepSeek-V3.2-Fast').trim();
 
   if (!apiKey || !baseURL) {
     console.warn("DeepSeek配置缺失，使用降级点评");
