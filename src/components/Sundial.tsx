@@ -202,7 +202,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
                       className="text-xs font-black font-mono"
                       fill="var(--retro-black)"
                     >
-                      {p.product.brand.slice(0, 2)}
+                      {(p.product?.brand || p.product?.name || '??').slice(0, 2)}
                     </text>
                   </g>
                 );

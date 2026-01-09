@@ -58,10 +58,17 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
   };
 
   const handleAdoptAll = () => {
-    const productsToAdopt = analysis!.recommendedProducts
+    if (!analysis) return;
+    
+    const productsToAdopt = analysis.recommendedProducts
       .filter((_, i) => selectedProducts.includes(i.toString()))
-      .map(rp => rp.matchedProduct!)
-      .filter(Boolean);
+      .map(rp => rp.matchedProduct)
+      .filter((p): p is Product => p !== undefined && p !== null);
+
+    if (productsToAdopt.length === 0) {
+      alert(language === 'zh' ? '没有可导入的产品' : 'No products to import');
+      return;
+    }
 
     onAdoptProducts(productsToAdopt);
 

@@ -134,16 +134,22 @@ export default function Home() {
         name: currentList?.name || "My Schedule",
         timeSlots: schedule.map((slot: any) => ({
           time: slot.time,
-          products: slot.supplements.map((supp: any) => {
-            const productItem = products.find(p => p.productId === supp.id);
-            return {
-              productId: supp.id,
-              product: productItem!.product,
-              dosage: supp.dosage || productItem!.product.dosagePerServing
-            };
-          }),
+          products: slot.supplements
+            .map((supp: any) => {
+              const productItem = products.find(p => p.productId === supp.id);
+              if (!productItem) {
+                console.warn(`[Schedule] Product not found for id: ${supp.id}`);
+                return null;
+              }
+              return {
+                productId: supp.id,
+                product: productItem.product,
+                dosage: supp.dosage || productItem.product.dosagePerServing
+              };
+            })
+            .filter((p: any): p is NonNullable<typeof p> => p !== null),
           reasoning: slot.reasoning || (language === 'zh' ? "AI优化排程" : "AI optimized schedule")
-        })),
+        })).filter((slot: any) => slot.products.length > 0),
         conflicts: apiConflicts || [],
         synergies: aiResult?.data?.synergies || [],
         optimizedAt: new Date(),

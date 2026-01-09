@@ -216,16 +216,22 @@ Output pure JSON, no extra text:
 
     const validSchedule = parsed.schedule.map((slot: any) => ({
       time: slot.time,
-      supplements: slot.products.map((p: any) => {
-        const product = products[p.index];
-        return {
-          id: product.id,
-          name: product.name,
-          dosage: product.dosagePerServing
-        };
-      }),
+      supplements: slot.products
+        .map((p: any) => {
+          const product = products[p.index];
+          if (!product) {
+            console.warn(`[AI排程] 产品索引越界: ${p.index}, 总产品数: ${products.length}`);
+            return null;
+          }
+          return {
+            id: product.id,
+            name: product.name,
+            dosage: product.dosagePerServing
+          };
+        })
+        .filter((s: any): s is NonNullable<typeof s> => s !== null),
       reasoning: slot.reasoning
-    }));
+    })).filter((slot: any) => slot.supplements.length > 0);
 
     return validSchedule;
 
@@ -383,16 +389,22 @@ Output pure JSON, no extra text:
     // 验证并映射产品
     const validSchedule = parsed.schedule.map((slot: any) => ({
       time: slot.time,
-      supplements: slot.products.map((p: any) => {
-        const product = products[p.index];
-        return {
-          id: product.id,
-          name: product.name,
-          dosage: product.dosagePerServing
-        };
-      }),
+      supplements: slot.products
+        .map((p: any) => {
+          const product = products[p.index];
+          if (!product) {
+            console.warn(`[AI排程] 产品索引越界: ${p.index}, 总产品数: ${products.length}`);
+            return null;
+          }
+          return {
+            id: product.id,
+            name: product.name,
+            dosage: product.dosagePerServing
+          };
+        })
+        .filter((s: any): s is NonNullable<typeof s> => s !== null),
       reasoning: slot.reasoning
-    }));
+    })).filter((slot: any) => slot.supplements.length > 0);
 
     console.log(`[AI排程] 验证并映射完成`);
     return validSchedule;
