@@ -28,13 +28,14 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: inputMode === 'text' ? input : videoUrl,
-          mode: inputMode
+          mode: inputMode,
+          language
         }),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || 'AI分析失败');
+        throw new Error(errorData.error || t.analysisFailed);
       }
 
       const data = await res.json();
@@ -49,9 +50,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
     } catch (err) {
       console.error('AI分析错误:', err);
       alert(
-        language === 'zh'
-          ? `分析失败: ${err instanceof Error ? err.message : '未知错误'}`
-          : `Analysis failed: ${err instanceof Error ? err.message : 'Unknown error'}`
+        `${t.analysisFailed}: ${err instanceof Error ? err.message : t.unknownError}`
       );
     } finally {
       setLoading(false);
@@ -79,7 +78,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
       <div className="bg-retro-yellow border-3 border-retro-black p-2 mb-4">
         <h2 className="font-black text-lg uppercase font-mono text-retro-black flex items-center gap-2">
           <RotatingPointer />
-          {language === 'zh' ? '博主推荐' : 'INFLUENCER'}
+          {t.influencerRecommend}
         </h2>
       </div>
 
@@ -93,7 +92,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
               : 'bg-white text-retro-black hover:bg-gray-100'
           }`}
         >
-          {language === 'zh' ? '文字' : 'TEXT'}
+          {t.textMode}
         </button>
         <button
           onClick={() => setInputMode('video')}
@@ -103,7 +102,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
               : 'bg-white text-retro-black hover:bg-gray-100'
           }`}
         >
-          {language === 'zh' ? '视频' : 'VIDEO'}
+          {t.videoMode}
         </button>
       </div>
 
@@ -111,7 +110,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
       {inputMode === 'text' && (
         <textarea
           className="w-full h-32 p-3 border-3 border-retro-green font-mono text-sm bg-white mb-3 resize-none text-retro-black placeholder:text-retro-gray/50"
-          placeholder={language === 'zh' ? '粘贴博主推荐文字...' : 'PASTE CONTENT...'}
+          placeholder={t.pasteInfluencerText}
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
@@ -123,12 +122,12 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
           <input
             type="text"
             className="w-full p-3 border-3 border-retro-green font-mono text-sm bg-white text-retro-black placeholder:text-retro-gray/50"
-            placeholder={language === 'zh' ? '粘贴视频链接 (YouTube/B站/抖音)...' : 'PASTE VIDEO URL...'}
+            placeholder={t.pasteVideoUrl}
             value={videoUrl}
             onChange={(e) => setVideoUrl(e.target.value)}
           />
           <div className="text-xs font-mono text-retro-black/50 bg-retro-green/10 p-2 border-2 border-retro-green">
-            {language === 'zh' ? '支持' : 'SUPPORTED'}: YouTube, Bilibili, Douyin, Xiaohongshu
+            {t.supportedPlatforms}: YouTube, Bilibili, Douyin, Xiaohongshu
           </div>
         </div>
       )}
@@ -138,10 +137,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
         disabled={loading || (inputMode === 'text' ? !input.trim() : !videoUrl.trim())}
         className="retro-button w-full py-3 mb-4 font-mono font-black text-retro-black disabled:opacity-50"
       >
-        {loading
-          ? (language === 'zh' ? 'AI分析中...' : 'ANALYZING...')
-          : (language === 'zh' ? 'AI分析' : 'AI ANALYZE')
-        }
+        {loading ? t.analyzing : t.aiAnalyze}
       </button>
 
       {/* 分析结果 */}
@@ -149,7 +145,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
         <div className="flex-1 overflow-y-auto space-y-3 pr-1">
           <div className="bg-retro-green/10 border-2 border-retro-green p-3">
             <div className="text-xs font-mono text-retro-black mb-2">
-              {language === 'zh' ? '可信度' : 'CREDIBILITY'}: {analysis.credibilityScore}/100
+              {t.credibility}: {analysis.credibilityScore}/100
             </div>
             {analysis.warnings.length > 0 && (
               <div className="text-xs font-mono text-red-500">
@@ -159,7 +155,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
           </div>
 
           <div className="font-bold text-sm font-mono text-retro-black mb-2">
-            {language === 'zh' ? '发现产品' : 'FOUND PRODUCTS'}:
+            {t.foundProducts}:
           </div>
 
           {analysis.recommendedProducts.map((rp, i) => (
@@ -202,7 +198,7 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
                   )}
                   {!rp.matchedProduct && (
                     <div className="text-xs font-mono text-red-500 mt-1">
-                      ! {language === 'zh' ? '数据库中未找到' : 'NOT IN DATABASE'}
+                      ! {t.notInDatabase}
                     </div>
                   )}
                 </div>
@@ -214,14 +210,14 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
             onClick={handleAdoptAll}
             className="retro-button w-full py-3 font-mono font-black text-retro-black"
           >
-            {language === 'zh' ? '采用选中产品' : 'ADOPT SELECTED'} ({selectedProducts.length})
+            {t.adoptSelected} ({selectedProducts.length})
           </button>
         </div>
       )}
 
       {!analysis && !loading && (
         <div className="flex-1 flex items-center justify-center text-center font-mono text-xs text-retro-black/50">
-          [{language === 'zh' ? '粘贴博主内容开始分析' : 'PASTE CONTENT TO START'}]
+          [{t.pasteContentToStart}]
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeVideoContent } from "@/lib/ai-analyzer";
 import type { InfluencerAnalysis, Product } from "@/types/product";
+import type { Language } from "@/lib/i18n";
 import { PRODUCTS_DATABASE } from "@/data/products";
 
 /**
@@ -10,7 +11,7 @@ import { PRODUCTS_DATABASE } from "@/data/products";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { text, mode } = body;
+    const { text, mode, language = 'zh' } = body as { text: string; mode: string; language?: Language };
 
     if (!text || typeof text !== "string") {
       return NextResponse.json(
@@ -20,11 +21,11 @@ export async function POST(request: NextRequest) {
     }
 
     // 调用AI分析（DeepSeek或Claude）
-    console.log(`[AI分析] 使用AI provider分析内容...`);
-    const aiResult = await analyzeVideoContent(text, "description");
+    console.log(`[AI Analysis] Using AI provider to analyze content...`);
+    const aiResult = await analyzeVideoContent(text, "description", language);
 
-    console.log(`[AI分析] 分析完成，发现 ${aiResult.supplements.length} 个补剂`);
-    console.log(`[AI分析] 可信度评分: ${aiResult.credibilityScore}/100`);
+    console.log(`[AI Analysis] Completed, found ${aiResult.supplements.length} supplements`);
+    console.log(`[AI Analysis] Credibility score: ${aiResult.credibilityScore}/100`);
 
     // 将AI结果转换为InfluencerAnalysis格式
     const analysis: InfluencerAnalysis = {
@@ -36,9 +37,9 @@ export async function POST(request: NextRequest) {
         let matchedProduct = findMatchingProduct(supp.name);
 
         // 如果没有匹配到，且AI标记为食材或无品牌，创建临时产品
-        if (!matchedProduct && (supp.isFood || !supp.brand || supp.brand === "无品牌")) {
-          matchedProduct = createFoodProduct(supp);
-          console.log(`[创建临时食材] ${supp.name} -> ${matchedProduct.name}`);
+        if (!matchedProduct && (supp.isFood || !supp.brand || supp.brand === "无品牌" || supp.brand === "No Brand")) {
+          matchedProduct = createFoodProduct(supp, language);
+          console.log(`[Create temp food] ${supp.name} -> ${matchedProduct.name}`);
         }
 
         return {
@@ -61,10 +62,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error("[AI分析] API错误:", error);
+    console.error("[AI Analysis] API error:", error);
     return NextResponse.json(
       {
-        error: "AI分析失败: " + (error instanceof Error ? error.message : String(error))
+        error: "AI analysis failed: " + (error instanceof Error ? error.message : String(error))
       },
       { status: 500 }
     );
@@ -74,17 +75,17 @@ export async function POST(request: NextRequest) {
 /**
  * 创建临时食材产品（如果数据库中没有）
  */
-function createFoodProduct(aiResult: any): Product {
+function createFoodProduct(aiResult: any, language: Language): Product {
   const category = determineFoodCategory(aiResult.name, aiResult.category);
   const ingredients = inferNutrients(aiResult.name, category);
 
   return {
     id: `temp-food-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     name: aiResult.name,
-    brand: aiResult.brand || "日常食材",
+    brand: aiResult.brand || (language === 'zh' ? "日常食材" : "Daily Food"),
     category: category,
     ingredients: ingredients,
-    dosagePerServing: aiResult.dosage || "适量",
+    dosagePerServing: aiResult.dosage || (language === 'zh' ? "适量" : "as needed"),
     servingsPerDay: 1,
     optimalTiming: determineTimingFromAI(aiResult.timing),
   };
@@ -98,7 +99,7 @@ function inferNutrients(name: string, category: any): any[] {
   const nutrients: any[] = [];
 
   // 维生素C相关
-  if (/(维生素c|维c|vc|vit.*c|ascorbic|卡姆果|针叶樱桃|橙|柠檬|猕猴桃)/i.test(normalized)) {
+  if (/(维生素c|维c|vc|vit.*c|ascorbic|卡姆果|针叶樱桃|橙|柠檬|猕猴桃|vitamin c)/i.test(normalized)) {
     nutrients.push({
       nutrient: { id: "vit-c", name: "维生素C", commonName: "VC", category: "VITAMIN_WATER_SOLUBLE", aliases: [] },
       amount: 100,
@@ -176,7 +177,7 @@ function inferNutrients(name: string, category: any): any[] {
   }
 
   // 维生素E
-  if (/(维生素e|维e|ve|vit.*e|tocopherol)/i.test(normalized)) {
+  if (/(维生素e|维e|ve|vit.*e|tocopherol|vitamin e)/i.test(normalized)) {
     nutrients.push({
       nutrient: { id: "vit-e", name: "维生素E", commonName: "VE", category: "VITAMIN_FAT_SOLUBLE", aliases: [] },
       amount: 15,
@@ -186,7 +187,7 @@ function inferNutrients(name: string, category: any): any[] {
   }
 
   // 维生素D
-  if (/(维生素d|维d|vd|vit.*d|cholecalciferol)/i.test(normalized)) {
+  if (/(维生素d|维d|vd|vit.*d|cholecalciferol|vitamin d)/i.test(normalized)) {
     nutrients.push({
       nutrient: { id: "vit-d", name: "维生素D", commonName: "VD", category: "VITAMIN_FAT_SOLUBLE", aliases: [] },
       amount: 1000,
@@ -249,7 +250,7 @@ function determineFoodCategory(name: string, aiCategory?: string): any {
   }
 
   // 肉类
-  if (/(肉|鸡|鸭|鱼|猪|牛|羊|虾|蟹|贝|海鲜|chicken|beef|pork|fish|seafood)/i.test(normalized)) {
+  if (/(肉|鸡|鸭|鱼|猪|牛|羊|虾|蟹|贝|海鲜|chicken|beef|pork|fish|seafood|meat)/i.test(normalized)) {
     return "FOOD_MEAT";
   }
 
@@ -332,16 +333,25 @@ function findMatchingProduct(supplementName: string): Product | null {
   // 关键词映射
   const keywordMap: Record<string, string> = {
     "维生素d": "vd3",
+    "vitamin d": "vd3",
     "维生素c": "vc",
+    "vitamin c": "vc",
     "维生素e": "ve",
+    "vitamin e": "ve",
     "维生素a": "va",
+    "vitamin a": "va",
     "维生素b": "vb",
+    "vitamin b": "vb",
     "omega-3": "omega",
     "鱼油": "omega",
+    "fish oil": "omega",
     "dha": "omega",
     "蛋白粉": "protein",
+    "protein": "protein",
     "乳清蛋白": "protein",
+    "whey protein": "protein",
     "益生菌": "probiotic",
+    "probiotic": "probiotic",
     "辅酶q10": "coq10",
     "coq10": "coq10",
   };
@@ -354,7 +364,7 @@ function findMatchingProduct(supplementName: string): Product | null {
         p.name.toLowerCase().includes(keyword)
       );
       if (product) {
-        console.log(`[产品匹配] ${supplementName} -> ${product.name}`);
+        console.log(`[Product Match] ${supplementName} -> ${product.name}`);
         return product;
       }
     }
@@ -367,9 +377,9 @@ function findMatchingProduct(supplementName: string): Product | null {
   );
 
   if (directMatch) {
-    console.log(`[产品匹配] ${supplementName} -> ${directMatch.name}`);
+    console.log(`[Product Match] ${supplementName} -> ${directMatch.name}`);
   } else {
-    console.log(`[产品匹配] ${supplementName} -> 未找到匹配产品`);
+    console.log(`[Product Match] ${supplementName} -> No match found`);
   }
 
   return directMatch || null;

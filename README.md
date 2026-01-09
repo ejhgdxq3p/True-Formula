@@ -511,6 +511,45 @@ const systemPrompt = `
 
 ---
 
+## 🚢 部署到Vercel
+
+### 一键部署
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/true-formula)
+
+### 手动部署步骤
+
+1. **Fork本仓库**到你的GitHub账号
+
+2. **在Vercel创建新项目**
+   - 访问 [vercel.com](https://vercel.com)
+   - 点击 "Import Project"
+   - 选择你fork的仓库
+
+3. **配置环境变量**
+   在Vercel项目设置中添加：
+   ```
+   DEEPSEEK_API_KEY=your_api_key
+   DEEPSEEK_BASE_URL=https://www.sophnet.com/api/open-apis/v1
+   DEEPSEEK_MODEL=DeepSeek-V3.2-Fast
+   AI_PROVIDER=deepseek
+   ```
+
+4. **部署**
+   - Vercel会自动检测Next.js项目
+   - 点击 "Deploy" 即可
+   - 部署完成后会得到一个 `.vercel.app` 域名
+
+5. **（可选）绑定自定义域名**
+   - 在Vercel项目设置中添加域名
+   - 配置DNS解析
+
+### 在线地址
+
+项目已部署在: [https://true-formula.vercel.app/](https://true-formula.vercel.app/)
+
+---
+
 ## 📄 License
 
 MIT License

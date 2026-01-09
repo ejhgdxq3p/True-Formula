@@ -10,6 +10,8 @@ import CommunityWall from "@/components/CommunityWall";
 import ProductLibraryModal from "@/components/ProductLibraryModal";
 import RotatingPointer from "@/components/RotatingPointer";
 import { useTranslation, type Language } from "@/lib/i18n";
+import { getProductDisplayName } from "@/lib/product-translator";
+import { getFallbackTexts } from "@/prompts/fallback";
 import type { Product, MyListProduct, Sundial as SundialType, SundialSlot, MyListCollection } from "@/types/product";
 import { detectProductConflicts } from "@/lib/product-conflict-detector";
 
@@ -21,7 +23,7 @@ export default function Home() {
   const [myLists, setMyLists] = useState<MyListCollection[]>([
     {
       id: "default-list",
-      name: language === 'zh' ? "我的配方" : "My Stack",
+      name: t.myList,
       products: [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -95,7 +97,7 @@ export default function Home() {
     try {
       // 步骤1：先检测冲突
       const detectedConflicts = detectProductConflicts(products);
-      console.log(`[排程] 检测到 ${detectedConflicts.length} 个冲突`);
+      console.log(`[Schedule] Detected ${detectedConflicts.length} conflicts`);
 
       // 步骤2：调用AI智能排程（让AI真正思考时间分配）
       const aiResponse = await fetch('/api/ai-schedule', {
@@ -116,14 +118,14 @@ export default function Home() {
         aiResult = await aiResponse.json();
         if (aiResult.success && aiResult.data?.schedule) {
           schedule = aiResult.data.schedule;
-          console.log(`[排程] AI生成 ${schedule.length} 个时间槽`);
+          console.log(`[Schedule] AI generated ${schedule.length} time slots`);
         } else {
-          throw new Error('AI排程返回格式错误');
+          throw new Error('AI schedule format error');
         }
       } else {
         // AI排程失败，使用降级方案
-        console.warn('[排程] AI排程失败，使用降级方案');
-        throw new Error('AI排程不可用');
+        console.warn('[Schedule] AI scheduling failed, using fallback');
+        throw new Error('AI scheduling unavailable');
       }
 
       // 构建日晷数据
@@ -140,7 +142,7 @@ export default function Home() {
               dosage: supp.dosage || productItem!.product.dosagePerServing
             };
           }),
-          reasoning: slot.reasoning || "AI优化排程"
+          reasoning: slot.reasoning || (language === 'zh' ? "AI优化排程" : "AI optimized schedule")
         })),
         conflicts: apiConflicts || [],
         synergies: aiResult?.data?.synergies || [],
@@ -155,10 +157,8 @@ export default function Home() {
         const aiCommentary = await fetchAICommentary(sundialData);
         sundialData.aiCommentary = aiCommentary;
       } catch (error) {
-        console.error('[排程] AI点评失败，但继续显示日晷:', error);
-        sundialData.aiCommentary = language === 'zh'
-          ? "AI点评暂时不可用，请检查API配置。"
-          : "AI commentary unavailable. Please check API configuration.";
+        console.error('[Schedule] AI commentary failed, continuing with sundial:', error);
+        sundialData.aiCommentary = t.aiCommentaryUnavailable;
       }
 
       setSundial(sundialData);
@@ -166,7 +166,7 @@ export default function Home() {
       updateCurrentList({ conflictCount: (apiConflicts || []).length });
 
     } catch (error) {
-      console.error('排程优化失败:', error);
+      console.error('Schedule optimization failed:', error);
 
       // 降级到简单排程
       const detectedConflicts = detectProductConflicts(products);
@@ -182,7 +182,7 @@ export default function Home() {
 
         let slot = simpleSlots.find(s => s.time === time);
         if (!slot) {
-          slot = { time, products: [], reasoning: "基于产品推荐时间" };
+          slot = { time, products: [], reasoning: language === 'zh' ? "基于产品推荐时间" : "Based on recommended timing" };
           simpleSlots.push(slot);
         }
         slot.products.push({
@@ -202,9 +202,7 @@ export default function Home() {
         isPublic: false,
         forkCount: 0,
         likeCount: 0,
-        aiCommentary: language === 'zh'
-          ? "AI排程服务暂时不可用，已为您生成基础排程。"
-          : "AI service unavailable. Basic schedule generated."
+        aiCommentary: t.aiServiceUnavailable
       };
 
       setSundial(fallbackSundial);
@@ -218,7 +216,7 @@ export default function Home() {
   // 获取AI点评（确保使用真实AI）
   const fetchAICommentary = async (sundial: SundialType): Promise<string> => {
     try {
-      console.log('[AI点评] 开始调用API...');
+      console.log('[AI Commentary] Calling API...');
       const response = await fetch('/api/ai-commentary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -232,55 +230,27 @@ export default function Home() {
         })
       });
 
-      console.log('[AI点评] API响应状态:', response.status, response.statusText);
+      console.log('[AI Commentary] API response status:', response.status, response.statusText);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('[AI点评] API返回错误:', errorText);
-        throw new Error(`AI点评API错误: ${response.status} - ${errorText}`);
+        console.error('[AI Commentary] API error:', errorText);
+        throw new Error(`AI commentary API error: ${response.status} - ${errorText}`);
       }
 
       const result = await response.json();
-      console.log('[AI点评] API返回结果:', result);
+      console.log('[AI Commentary] API result:', result);
 
       if (!result.success || !result.data?.commentary) {
-        console.error('[AI点评] 返回格式错误:', result);
-        throw new Error('AI点评返回格式错误');
+        console.error('[AI Commentary] Format error:', result);
+        throw new Error('AI commentary format error');
       }
 
-      console.log('[AI点评] 成功生成，长度:', result.data.commentary.length);
+      console.log('[AI Commentary] Success, length:', result.data.commentary.length);
       return result.data.commentary;
     } catch (error) {
-      console.error('[AI点评] 完整错误信息:', error);
+      console.error('[AI Commentary] Full error:', error);
       throw error; // 重新抛出错误，让外层处理
-    }
-  };
-
-  // 降级点评
-  const generateFallbackCommentary = (sundial: SundialType): string => {
-    const conflicts = sundial.conflicts.length;
-    const productCount = sundial.timeSlots.reduce((sum, s) => sum + s.products.length, 0);
-
-    if (language === 'zh') {
-      if (conflicts === 0 && productCount <= 5) {
-        return "不错嘛，简洁高效的配方。但说实话，这么保守的搭配我闭着眼睛都能设计出来。";
-      } else if (conflicts === 0 && productCount > 5) {
-        return "啧啧，居然真的0冲突？看来你在这上面下了功夫。不过产品有点多，钱包还好吗？";
-      } else if (conflicts > 0 && conflicts <= 2) {
-        return `有${conflicts}个冲突但还能抢救。建议：别瞎吃，听AI的把时间调开。现在这样吃纯属浪费。`;
-      } else {
-        return `${conflicts}个冲突？你这是补剂还是化学实验？建议从头来过，让AI帮你重新规划。`;
-      }
-    } else {
-      if (conflicts === 0 && productCount <= 5) {
-        return "Clean stack. Simple. Boring. But hey, at least you won't poison yourself.";
-      } else if (conflicts === 0 && productCount > 5) {
-        return "Zero conflicts? Impressive. But that's a lot of pills. Your liver doing okay?";
-      } else if (conflicts > 0 && conflicts <= 2) {
-        return `${conflicts} conflicts detected. Not terrible, but needs work. Let AI fix your timing.`;
-      } else {
-        return `${conflicts} conflicts. Is this a supplement stack or a chemistry disaster? Start over.`;
-      }
     }
   };
 
@@ -451,7 +421,7 @@ export default function Home() {
           {activeProduct ? (
             <div className="border-3 border-retro-green bg-white p-3 shadow-hard w-64 rotate-3 opacity-90 cursor-grabbing">
               <div className="font-bold text-sm font-mono uppercase text-retro-black">
-                {activeProduct.name}
+                {getProductDisplayName(activeProduct, language)}
               </div>
             </div>
           ) : null}

@@ -24,6 +24,7 @@ export default function WorkbenchModal({
   onClose,
   language
 }: WorkbenchModalProps) {
+  const t = useTranslation(language);
   const [isCreating, setIsCreating] = useState(false);
   const [newListName, setNewListName] = useState("");
 
@@ -59,10 +60,10 @@ export default function WorkbenchModal({
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-xs font-mono text-retro-black truncate">
-              {list.isFork ? list.originalAuthor : (language === 'zh' ? '我' : 'Me')}
+              {list.isFork ? list.originalAuthor : t.me}
             </p>
             <p className="text-[10px] font-mono text-retro-black/50">
-              {new Date(list.createdAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
+              {new Date(list.createdAt).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US', { month: 'numeric', day: 'numeric' })}
             </p>
           </div>
         </div>
@@ -93,7 +94,7 @@ export default function WorkbenchModal({
 
         {/* 统计 */}
         <div className="text-[10px] font-mono text-retro-black mb-2 text-center">
-          {list.products.length} {language === 'zh' ? '产品' : 'ITEMS'}
+          {list.products.length} {t.items}
         </div>
 
         {/* 底部统计条（更紧凑）*/}
@@ -103,7 +104,7 @@ export default function WorkbenchModal({
           </span>
           {list.isFork && <span className="text-[9px]">🔱</span>}
           <span className="text-retro-black/60 text-[9px]">
-            {new Date(list.updatedAt).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
+            {new Date(list.updatedAt).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US', { month: 'numeric', day: 'numeric' })}
           </span>
         </div>
 
@@ -116,7 +117,7 @@ export default function WorkbenchModal({
           }}
           className={`retro-button w-full py-1 text-xs font-mono font-bold text-retro-black`}
         >
-          {isActive ? '✓' : (language === 'zh' ? '选择' : 'SELECT')}
+          {isActive ? '✓' : t.select}
         </button>
       </div>
     );
@@ -134,10 +135,10 @@ export default function WorkbenchModal({
               </div>
               <div>
                 <h2 className="font-black text-2xl font-mono uppercase text-retro-black">
-                  {language === 'zh' ? '我的工作台' : 'MY WORKBENCH'}
+                  {t.myWorkbench}
                 </h2>
                 <p className="text-sm font-mono text-retro-green font-bold">
-                  [{language === 'zh' ? '管理你的所有产品清单' : 'MANAGE ALL LISTS'}]
+                  [{t.manageAllLists}]
                 </p>
               </div>
             </div>
@@ -149,7 +150,7 @@ export default function WorkbenchModal({
                   onClick={() => setIsCreating(true)}
                   className="retro-button px-6 py-3 font-mono font-bold text-retro-black"
                 >
-                  + {language === 'zh' ? '新建清单' : 'NEW'}
+                  + {t.newList}
                 </button>
               )}
               <button
@@ -167,13 +168,13 @@ export default function WorkbenchModal({
           {isCreating && (
             <div className="retro-border bg-retro-yellow/10 p-6 mb-6">
               <h3 className="font-black text-sm font-mono uppercase text-retro-black mb-3">
-                {language === 'zh' ? '新建产品清单' : 'CREATE NEW LIST'}
+                {t.createNewListTitle}
               </h3>
               <input
                 type="text"
                 value={newListName}
                 onChange={(e) => setNewListName(e.target.value)}
-                placeholder={language === 'zh' ? '输入清单名称 (如：增肌配方)' : 'Name...'}
+                placeholder={t.inputListName}
                 className="w-full p-3 border-3 border-retro-green font-mono text-sm bg-white mb-3"
                 autoFocus
                 onKeyDown={(e) => {
@@ -187,7 +188,7 @@ export default function WorkbenchModal({
                   disabled={!newListName.trim()}
                   className="retro-button flex-1 py-3 font-mono font-bold disabled:opacity-50"
                 >
-                  {language === 'zh' ? '创建' : 'CREATE'}
+                  {t.create}
                 </button>
                 <button
                   onClick={() => {
@@ -196,7 +197,7 @@ export default function WorkbenchModal({
                   }}
                   className="border-3 border-retro-black bg-white hover:bg-gray-100 flex-1 py-3 font-mono font-bold"
                 >
-                  {language === 'zh' ? '取消' : 'CANCEL'}
+                  {t.cancel}
                 </button>
               </div>
             </div>
@@ -207,7 +208,7 @@ export default function WorkbenchModal({
             <div className="mb-8">
               <div className="bg-retro-green border-3 border-retro-black p-3 mb-4">
                 <h3 className="font-black text-sm font-mono uppercase text-retro-black">
-                  {language === 'zh' ? '我创建的清单' : 'MY LISTS'}
+                  {t.myCreatedLists}
                 </h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
@@ -221,7 +222,7 @@ export default function WorkbenchModal({
             <div>
               <div className="bg-retro-yellow border-3 border-retro-black p-3 mb-4">
                 <h3 className="font-black text-sm font-mono uppercase text-retro-black">
-                  {language === 'zh' ? '我 FORK 的清单' : 'FORKED LISTS'}
+                  {t.forkedLists}
                 </h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
@@ -234,7 +235,7 @@ export default function WorkbenchModal({
           {myLists.length === 0 && forkedLists.length === 0 && !isCreating && (
             <div className="text-center py-16">
               <div className="text-sm font-mono text-retro-black/50 mb-4">
-                [{language === 'zh' ? '还没有清单，点击右上角新建' : 'NO LISTS'}]
+                [{t.noLists}]
               </div>
             </div>
           )}

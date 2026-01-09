@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Product } from "@/types/product";
 import { ProductCategory } from "@/types/product";
 import { useTranslation, type Language } from "@/lib/i18n";
+import { getProductDisplayName, translateBrand } from "@/lib/product-translator";
 import { PRODUCTS_DATABASE } from "@/data/products";
 
 interface ProductLibraryModalProps {
@@ -24,7 +25,8 @@ export default function ProductLibraryModal({ onSelect, onClose, language }: Pro
   // 筛选逻辑
   const filteredProducts = PRODUCTS_DATABASE.filter(p => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
-                       p.brand.toLowerCase().includes(search.toLowerCase());
+                       p.brand.toLowerCase().includes(search.toLowerCase()) ||
+                       getProductDisplayName(p, 'en').toLowerCase().includes(search.toLowerCase());
     const matchBrand = selectedBrands.length === 0 || selectedBrands.includes(p.brand);
     const matchCategory = selectedCategories.length === 0 || selectedCategories.includes(p.category);
     return matchSearch && matchBrand && matchCategory;
@@ -36,7 +38,7 @@ export default function ProductLibraryModal({ onSelect, onClose, language }: Pro
         {/* Header */}
         <div className="bg-retro-black text-retro-yellow p-4 flex justify-between items-center border-b-2 border-retro-green">
           <h2 className="font-black text-xl font-mono uppercase">
-            {language === 'zh' ? '产品库' : 'PRODUCT LIBRARY'}
+            {t.productLibrary}
           </h2>
           <button onClick={onClose} className="text-retro-yellow hover:text-white text-2xl font-bold">X</button>
         </div>
@@ -71,7 +73,7 @@ export default function ProductLibraryModal({ onSelect, onClose, language }: Pro
                     >
                       {selectedBrands.includes(brand) && <span className="text-[8px] font-bold">✓</span>}
                     </div>
-                    <span>{brand}</span>
+                    <span>{translateBrand(brand, language)}</span>
                   </label>
                 ))}
               </div>
@@ -112,9 +114,11 @@ export default function ProductLibraryModal({ onSelect, onClose, language }: Pro
                     onClose();
                   }}
                 >
-                  <div className="text-xs text-retro-black/60 font-mono mb-1">{product.brand}</div>
+                  <div className="text-xs text-retro-black/60 font-mono mb-1">
+                    {translateBrand(product.brand, language)}
+                  </div>
                   <h3 className="font-bold text-sm font-mono text-retro-black mb-2 leading-tight">
-                    {product.name}
+                    {getProductDisplayName(product, language)}
                   </h3>
                   
                   {/* Ingredients Preview */}
@@ -130,7 +134,7 @@ export default function ProductLibraryModal({ onSelect, onClose, language }: Pro
                   {/* Add Button Overlay */}
                   <div className="absolute inset-0 bg-retro-yellow/90 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                     <span className="font-black font-mono text-retro-black text-lg border-2 border-retro-black px-4 py-2 bg-white">
-                      + ADD
+                      + {t.add}
                     </span>
                   </div>
                 </div>

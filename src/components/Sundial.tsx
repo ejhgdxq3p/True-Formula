@@ -5,6 +5,8 @@ import { useDroppable } from "@dnd-kit/core";
 import type { Sundial as SundialType } from "@/types/product";
 import RotatingPointer from "@/components/RotatingPointer";
 import { useTranslation, type Language } from "@/lib/i18n";
+import { getProductDisplayName, translateDosage } from "@/lib/product-translator";
+import { generateFallbackCommentary } from "@/prompts/fallback";
 
 interface SundialProps {
   sundial: SundialType | null;
@@ -28,18 +30,35 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
   const CENTER = SIZE / 2;
   const RADIUS = 180;
 
+  // 翻译时间标签
+  const getTimingLabel = (timing: string) => {
+    const timingMap: Record<string, string> = {
+      'MORNING': t.timingMorning,
+      'AFTERNOON': t.timingAfternoon,
+      'EVENING': t.timingEvening,
+      'POST_WORKOUT': t.timingPostWorkout,
+      'BEFORE_BED': t.timingBeforeBed,
+      'WITH_FOOD': t.timingWithFood,
+      'MORNING_WITH_FOOD': t.timingMorning,
+      'MORNING_EMPTY_STOMACH': t.timingEmptyStomach,
+      'EMPTY_STOMACH': t.timingEmptyStomach,
+      'ANYTIME': t.timingAnytime,
+    };
+    return timingMap[timing] || timing;
+  };
+
   return (
     <div className="retro-border p-6 bg-white h-full flex flex-col overflow-y-auto">
       {/* 标题 */}
       <div className="bg-retro-black text-retro-yellow p-3 mb-6 text-center border-3 border-retro-yellow">
         <h2 className="font-black text-xl font-mono uppercase flex items-center justify-center gap-3">
           <RotatingPointer />
-          {language === 'zh' ? '我的日晷' : 'MY SUNDIAL'}
+          {t.mySundial}
           <RotatingPointer />
         </h2>
         {sundial && (
           <p className="text-xs mt-1 font-mono text-retro-yellow/80">
-            {language === 'zh' ? '最后优化' : 'LAST OPTIMIZED'}: {new Date(sundial.optimizedAt).toLocaleTimeString()}
+            {t.lastOptimized}: {new Date(sundial.optimizedAt).toLocaleTimeString(language === 'zh' ? 'zh-CN' : 'en-US')}
           </p>
         )}
       </div>
@@ -52,10 +71,10 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
             {/* 标题 */}
             <div className="text-center mb-8">
               <h3 className="font-black text-2xl font-mono uppercase text-retro-black mb-2">
-                {language === 'zh' ? 'AI 正在分析' : 'AI ANALYZING'}
+                {t.aiAnalyzing}
               </h3>
               <p className="text-sm font-mono text-retro-black/60">
-                {language === 'zh' ? '检测冲突、优化时间表...' : 'Optimizing schedule...'}
+                {t.optimizingSchedule}
               </p>
             </div>
 
@@ -208,7 +227,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
           <div className="text-center font-mono text-retro-black/50">
             <div className="text-4xl mb-4">○</div>
             <div className="text-sm">
-              [{language === 'zh' ? '加产品开始优化' : 'ADD PRODUCTS TO START'}]
+              [{t.addProductsToStart}]
             </div>
           </div>
         )}
@@ -225,7 +244,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
           >
             {/* 产品名称 */}
             <div className="font-black text-sm font-mono text-retro-black mb-1 uppercase border-b-2 border-retro-yellow pb-1">
-              {hoveredProduct.product.product.name}
+              {getProductDisplayName(hoveredProduct.product.product, language)}
             </div>
 
             {/* 品牌 */}
@@ -236,7 +255,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
             {/* 用量 */}
             <div className="bg-retro-green/10 border-2 border-retro-green px-2 py-1 mb-2">
               <span className="text-xs font-mono font-bold text-retro-black">
-                {language === 'zh' ? '用量' : 'DOSAGE'}: {hoveredProduct.product.dosage || hoveredProduct.product.product.dosagePerServing}
+                {t.dosage}: {translateDosage(hoveredProduct.product.dosage || hoveredProduct.product.product.dosagePerServing, language)}
               </span>
             </div>
 
@@ -244,7 +263,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
             {hoveredProduct.product.product.ingredients && hoveredProduct.product.product.ingredients.length > 0 && (
               <div className="mb-2">
                 <div className="text-xs font-mono font-bold text-retro-black mb-1">
-                  {language === 'zh' ? '主要成分' : 'INGREDIENTS'}:
+                  {t.ingredients}:
                 </div>
                 <div className="space-y-1">
                   {hoveredProduct.product.product.ingredients.slice(0, 5).map((ing: any, idx: number) => (
@@ -257,7 +276,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
                   ))}
                   {hoveredProduct.product.product.ingredients.length > 5 && (
                     <div className="text-xs font-mono text-retro-black/50">
-                      +{hoveredProduct.product.product.ingredients.length - 5} {language === 'zh' ? '更多' : 'more'}...
+                      +{hoveredProduct.product.product.ingredients.length - 5} {t.more}...
                     </div>
                   )}
                 </div>
@@ -266,16 +285,9 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
 
             {/* 推荐时间 */}
             <div className="bg-retro-yellow/20 border-2 border-retro-yellow px-2 py-1 text-xs font-mono">
-              <span className="font-bold">{language === 'zh' ? '推荐时间' : 'TIMING'}:</span>{' '}
+              <span className="font-bold">{t.timing}:</span>{' '}
               <span className="text-retro-black/70">
-                {hoveredProduct.product.product.optimalTiming === 'MORNING' && (language === 'zh' ? '早晨' : 'Morning')}
-                {hoveredProduct.product.product.optimalTiming === 'AFTERNOON' && (language === 'zh' ? '下午' : 'Afternoon')}
-                {hoveredProduct.product.product.optimalTiming === 'EVENING' && (language === 'zh' ? '傍晚' : 'Evening')}
-                {hoveredProduct.product.product.optimalTiming === 'POST_WORKOUT' && (language === 'zh' ? '运动后' : 'Post-Workout')}
-                {hoveredProduct.product.product.optimalTiming === 'BEFORE_BED' && (language === 'zh' ? '睡前' : 'Before Bed')}
-                {hoveredProduct.product.product.optimalTiming === 'WITH_FOOD' && (language === 'zh' ? '随餐' : 'With Food')}
-                {hoveredProduct.product.product.optimalTiming === 'EMPTY_STOMACH' && (language === 'zh' ? '空腹' : 'Empty Stomach')}
-                {hoveredProduct.product.product.optimalTiming === 'ANYTIME' && (language === 'zh' ? '任何时间' : 'Anytime')}
+                {getTimingLabel(hoveredProduct.product.product.optimalTiming)}
               </span>
             </div>
           </div>
@@ -287,12 +299,16 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
         <div className="bg-retro-yellow/20 border-3 border-retro-yellow p-4 mt-6 flex-shrink-0">
           <div className="flex items-center gap-2 mb-3">
             <h3 className="font-black text-sm font-mono uppercase text-retro-black">
-              {language === 'zh' ? 'AI 毒舌点评' : 'AI ROAST'}
+              {t.aiRoast}
             </h3>
           </div>
           <div className="max-h-32 overflow-y-auto pr-2">
             <p className="text-sm font-mono text-retro-black leading-relaxed whitespace-pre-wrap">
-              {sundial.aiCommentary || generateAIRoast(sundial, language)}
+              {sundial.aiCommentary || generateFallbackCommentary(
+                sundial.conflicts.length,
+                sundial.timeSlots.reduce((sum, s) => sum + s.products.length, 0),
+                language
+              )}
             </p>
           </div>
 
@@ -302,19 +318,19 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
               <div className="font-black text-2xl text-retro-black">
                 {sundial.timeSlots.reduce((sum, s) => sum + s.products.length, 0)}
               </div>
-              <div className="text-retro-black/60">{language === 'zh' ? '产品' : 'PRODUCTS'}</div>
+              <div className="text-retro-black/60">{t.products}</div>
             </div>
             <div>
               <div className={`font-black text-2xl ${sundial.conflicts.length > 0 ? 'text-red-500' : 'text-retro-green'}`}>
                 {sundial.conflicts.length}
               </div>
-              <div className="text-retro-black/60">{language === 'zh' ? '冲突' : 'CONFLICTS'}</div>
+              <div className="text-retro-black/60">{t.conflicts}</div>
             </div>
             <div>
               <div className="font-black text-2xl text-retro-green">
                 {sundial.synergies?.length || 0}
               </div>
-              <div className="text-retro-black/60">{language === 'zh' ? '协同' : 'SYNERGIES'}</div>
+              <div className="text-retro-black/60">{t.synergies}</div>
             </div>
           </div>
         </div>
@@ -455,32 +471,4 @@ function MeteorShowerBars({ language }: { language: Language }) {
       </svg>
     </div>
   );
-}
-
-// AI 毒舌点评生成器
-function generateAIRoast(sundial: SundialType, language: Language): string {
-  const conflicts = sundial.conflicts.length;
-  const productCount = sundial.timeSlots.reduce((sum, s) => sum + s.products.length, 0);
-
-  if (language === 'zh') {
-    if (conflicts === 0 && productCount <= 5) {
-      return "不错嘛，简洁高效的配方。但说实话，这么保守的搭配我闭着眼睛都能设计出来。";
-    } else if (conflicts === 0 && productCount > 5) {
-      return "啧啧，居然真的0冲突？看来你在这上面下了功夫。不过产品有点多，钱包还好吗？";
-    } else if (conflicts > 0 && conflicts <= 2) {
-      return `有${conflicts}个冲突但还能抢救。建议：别瞎吃，听AI的把时间调开。现在这样吃纯属浪费。`;
-    } else {
-      return `${conflicts}个冲突？你这是补剂还是化学实验？建议从头来过，让AI帮你重新规划。`;
-    }
-  } else {
-    if (conflicts === 0 && productCount <= 5) {
-      return "Clean stack. Simple. Boring. But hey, at least you won't poison yourself.";
-    } else if (conflicts === 0 && productCount > 5) {
-      return "Zero conflicts? Impressive. But that's a lot of pills. Your liver doing okay?";
-    } else if (conflicts > 0 && conflicts <= 2) {
-      return `${conflicts} conflicts detected. Not terrible, but needs work. Let AI fix your timing.`;
-    } else {
-      return `${conflicts} conflicts. Is this a supplement stack or a chemistry disaster? Start over.`;
-    }
-  }
 }

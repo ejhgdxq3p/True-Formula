@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "真配方 True Formula - AI智能补剂排程",
-  description: "科学补剂排程系统 - AI分析、冲突检测、智能优化",
+  title: "真配方 True Formula - AI-Powered Supplement Scheduling",
+  description: "Scientific supplement scheduling system - AI analysis, conflict detection, smart optimization | 科学补剂排程系统",
 };
 
 export default function RootLayout({

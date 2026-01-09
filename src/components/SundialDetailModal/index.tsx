@@ -2,6 +2,8 @@
 
 import type { Sundial } from "@/types/product";
 import { useTranslation, type Language } from "@/lib/i18n";
+import { getProductDisplayName, translateDosage } from "@/lib/product-translator";
+import { generateFallbackCommentary } from "@/prompts/fallback";
 import RotatingPointer from "@/components/RotatingPointer";
 
 interface SundialDetailModalProps {
@@ -35,7 +37,7 @@ export default function SundialDetailModal({
                 {sundial.name}
               </h2>
               <p className="text-xs font-mono text-retro-yellow/70">
-                {language === 'zh' ? '作者' : 'BY'}: {sundial.author}
+                {t.by}: {sundial.author}
               </p>
             </div>
           </div>
@@ -148,11 +150,15 @@ export default function SundialDetailModal({
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">🤖</span>
                 <h3 className="font-black text-sm font-mono uppercase text-retro-black">
-                  {language === 'zh' ? 'AI 毒舌点评' : 'AI ROAST'}
+                  {t.aiRoast}
                 </h3>
               </div>
               <p className="text-sm font-mono text-retro-black leading-relaxed">
-                {sundial.aiCommentary || generateAIRoast(sundial, language)}
+                {sundial.aiCommentary || generateFallbackCommentary(
+                  sundial.conflicts.length,
+                  sundial.timeSlots.reduce((sum, s) => sum + s.products.length, 0),
+                  language
+                )}
               </p>
             </div>
 
@@ -161,14 +167,14 @@ export default function SundialDetailModal({
               onClick={onFork}
               className="retro-button w-full py-4 mt-4 font-mono font-black text-retro-black text-lg"
             >
-              {language === 'zh' ? 'FORK 这个日晷' : 'FORK THIS SUNDIAL'}
+              {t.forkThisSundial}
             </button>
           </div>
 
           {/* 右侧：产品列表 */}
           <div className="space-y-4">
             <h3 className="font-black text-lg font-mono uppercase text-retro-black border-b-3 border-retro-green pb-2">
-              {language === 'zh' ? '产品清单' : 'PRODUCT LIST'}
+              {t.productList}
             </h3>
 
             {sundial.timeSlots.map((slot, i) => (
@@ -178,7 +184,7 @@ export default function SundialDetailModal({
                     {slot.time}
                   </div>
                   <span className="text-xs font-mono text-retro-black/60">
-                    {slot.products.length} {language === 'zh' ? '个产品' : 'PRODUCTS'}
+                    {slot.products.length} {t.products}
                   </span>
                 </div>
 
@@ -189,10 +195,10 @@ export default function SundialDetailModal({
                         {p.product.brand}
                       </div>
                       <div className="font-bold text-sm font-mono text-retro-black">
-                        {p.product.name}
+                        {getProductDisplayName(p.product, language)}
                       </div>
                       <div className="text-xs font-mono text-retro-green mt-1">
-                        {p.dosage}
+                        {translateDosage(p.dosage, language)}
                       </div>
                     </div>
                   ))}
@@ -212,7 +218,7 @@ export default function SundialDetailModal({
                     {sundial.timeSlots.reduce((sum, s) => sum + s.products.length, 0)}
                   </div>
                   <div className="text-xs font-mono">
-                    {language === 'zh' ? '产品' : 'PRODUCTS'}
+                    {t.products}
                   </div>
                 </div>
                 <div>
@@ -220,7 +226,7 @@ export default function SundialDetailModal({
                     {sundial.conflicts.length}
                   </div>
                   <div className="text-xs font-mono">
-                    {language === 'zh' ? '冲突' : 'CONFLICTS'}
+                    {t.conflicts}
                   </div>
                 </div>
                 <div>
@@ -228,7 +234,7 @@ export default function SundialDetailModal({
                     {sundial.likeCount}
                   </div>
                   <div className="text-xs font-mono">
-                    {language === 'zh' ? '点赞' : 'LIKES'}
+                    {t.likes}
                   </div>
                 </div>
               </div>
@@ -238,32 +244,4 @@ export default function SundialDetailModal({
       </div>
     </div>
   );
-}
-
-// AI毒舌点评生成器
-function generateAIRoast(sundial: Sundial, language: Language): string {
-  const conflicts = sundial.conflicts.length;
-  const productCount = sundial.timeSlots.reduce((sum, s) => sum + s.products.length, 0);
-
-  if (language === 'zh') {
-    if (conflicts === 0 && productCount <= 5) {
-      return "不错嘛，简洁高效的配方。但说实话，这么保守的搭配我闭着眼睛都能设计出来。";
-    } else if (conflicts === 0 && productCount > 5) {
-      return "啧啧，居然真的0冲突？看来你在这上面下了功夫。不过产品有点多，钱包还好吗？";
-    } else if (conflicts > 0 && conflicts <= 2) {
-      return `有${conflicts}个冲突但还能抢救。建议：别瞎吃，听AI的把时间调开。现在这样吃纯属浪费。`;
-    } else {
-      return `${conflicts}个冲突？你这是补剂还是化学实验？建议从头来过，让AI帮你重新规划。`;
-    }
-  } else {
-    if (conflicts === 0 && productCount <= 5) {
-      return "Clean stack. Simple. Boring. But hey, at least you won't poison yourself.";
-    } else if (conflicts === 0 && productCount > 5) {
-      return "Zero conflicts? Impressive. But that's a lot of pills. Your liver doing okay?";
-    } else if (conflicts > 0 && conflicts <= 2) {
-      return `${conflicts} conflicts detected. Not terrible, but needs work. Let AI fix your timing.`;
-    } else {
-      return `${conflicts} conflicts. Is this a supplement stack or a chemistry disaster? Start over.`;
-    }
-  }
 }

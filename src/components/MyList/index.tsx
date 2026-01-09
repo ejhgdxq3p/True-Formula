@@ -2,6 +2,7 @@
 
 import type { MyListCollection } from "@/types/product";
 import { useTranslation, type Language } from "@/lib/i18n";
+import { getProductDisplayName } from "@/lib/product-translator";
 import RotatingPointer from "@/components/RotatingPointer";
 
 interface MyListProps {
@@ -35,7 +36,7 @@ export default function MyList({
           <div className="absolute inset-0 bg-retro-black translate-x-1 translate-y-1"></div>
           <div className="relative bg-white border-3 border-retro-black px-4 py-3 min-w-[120px]">
             <h2 className="font-black text-xs uppercase font-mono text-retro-black">
-              {language === 'zh' ? '我的清单' : 'MY LIST'}
+              {t.myList}
             </h2>
           </div>
         </div>
@@ -44,12 +45,12 @@ export default function MyList({
         <button
           onClick={onOpenWorkbench}
           className="relative group"
-          title={language === 'zh' ? '打开工作台' : 'Open Workbench'}
+          title={t.openBench}
         >
           <div className="absolute inset-0 bg-retro-black translate-x-1 translate-y-1"></div>
           <div className="relative bg-retro-yellow border-3 border-retro-black px-4 py-3 group-hover:bg-retro-yellow/80 transition-colors">
             <span className="font-black text-xs font-mono text-retro-black uppercase">
-              {language === 'zh' ? '工作台' : 'BENCH'}
+              {t.bench}
             </span>
           </div>
         </button>
@@ -62,13 +63,13 @@ export default function MyList({
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <div className="text-xs font-mono text-retro-black/50 mb-4">
-                [{language === 'zh' ? '点击工作台选择清单' : 'CLICK BENCH'}]
+                [{t.clickBenchToSelect}]
               </div>
               <button
                 onClick={onOpenWorkbench}
                 className="retro-button px-6 py-3 font-mono font-black"
               >
-                {language === 'zh' ? '打开工作台' : 'OPEN BENCH'}
+                {t.openBench}
               </button>
             </div>
           </div>
@@ -79,14 +80,14 @@ export default function MyList({
               onClick={onAddProduct}
               className="retro-button w-full py-3 mb-4 font-mono font-black text-retro-black"
             >
-              + {language === 'zh' ? '加产品' : 'ADD'}
+              + {t.addProduct}
             </button>
 
             {/* 产品列表 */}
             <div className="flex-1 overflow-y-auto space-y-2 mb-4">
               {products.length === 0 ? (
                 <div className="text-center py-10 text-retro-black/50 font-mono text-xs">
-                  [{language === 'zh' ? '暂无产品' : 'EMPTY'}]
+                  [{t.noProducts}]
                 </div>
               ) : (
                 products.map((item) => (
@@ -100,7 +101,7 @@ export default function MyList({
                           {item.product.brand}
                         </div>
                         <h3 className="font-bold text-sm font-mono text-retro-black">
-                          {item.product.name}
+                          {getProductDisplayName(item.product, language)}
                         </h3>
                         <div className="text-xs font-mono text-retro-black/50 mt-1">
                           {item.product.ingredients.slice(0, 2).map((ing, i) => (
@@ -131,7 +132,7 @@ export default function MyList({
                 <div className="flex items-center gap-2 mb-2">
                   <div className={`w-3 h-3 ${hasConflicts ? 'bg-red-500' : 'bg-retro-green'}`}></div>
                   <h3 className="font-black text-xs font-mono uppercase text-retro-black">
-                    {language === 'zh' ? '冲突' : 'CONFLICTS'}
+                    {t.conflicts}
                   </h3>
                 </div>
 
@@ -158,7 +159,7 @@ export default function MyList({
                   </div>
                 ) : (
                   <div className="text-sm font-mono text-retro-green">
-                    ✓ {language === 'zh' ? '无冲突' : 'SAFE'}
+                    ✓ {t.safe}
                   </div>
                 )}
               </div>
