@@ -5,7 +5,7 @@ import { useDroppable } from "@dnd-kit/core";
 import type { Sundial as SundialType } from "@/types/product";
 import RotatingPointer from "@/components/RotatingPointer";
 import { useTranslation, type Language } from "@/lib/i18n";
-import { getNutrientDisplayName, getProductDisplayName, translateDosage } from "@/lib/product-translator";
+import { getNutrientDisplayName, getProductDisplayName, translateBrand, translateDosage } from "@/lib/product-translator";
 import { generateFallbackCommentary } from "@/prompts/fallback";
 
 interface SundialProps {
@@ -249,7 +249,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
 
             {/* 品牌 */}
             <div className="text-xs font-mono text-retro-black/60 mb-2">
-              {hoveredProduct.product.product.brand}
+              {translateBrand(hoveredProduct.product.product.brand, language)}
             </div>
 
             {/* 用量 */}

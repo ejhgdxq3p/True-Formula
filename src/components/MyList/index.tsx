@@ -2,7 +2,7 @@
 
 import type { MyListCollection } from "@/types/product";
 import { useTranslation, type Language } from "@/lib/i18n";
-import { getNutrientDisplayName, getProductDisplayName } from "@/lib/product-translator";
+import { getNutrientDisplayName, getProductDisplayName, translateBrand } from "@/lib/product-translator";
 import RotatingPointer from "@/components/RotatingPointer";
 
 interface MyListProps {
@@ -98,7 +98,7 @@ export default function MyList({
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="text-xs font-mono text-retro-black/60">
-                          {item.product.brand}
+                          {translateBrand(item.product.brand, language)}
                         </div>
                         <h3 className="font-bold text-sm font-mono text-retro-black">
                           {getProductDisplayName(item.product, language)}

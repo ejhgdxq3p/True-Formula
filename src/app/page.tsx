@@ -277,7 +277,7 @@ export default function Home() {
         isPublic: false,
         forkCount: 0,
         likeCount: 0,
-        aiCommentary: t.aiServiceUnavailable
+        aiCommentary: undefined
       };
 
       setSundial(fallbackSundial);

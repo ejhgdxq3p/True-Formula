@@ -7,7 +7,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import RotatingPointer from "@/components/RotatingPointer";
 import { useTranslation, type Language } from "@/lib/i18n";
-import { getNutrientDisplayName } from "@/lib/product-translator";
+import { getNutrientDisplayName, getProductDisplayName, translateBrand } from "@/lib/product-translator";
 
 interface ProductDrawerProps {
   products: Product[];
@@ -142,8 +142,12 @@ function DraggableProduct({ product, language }: { product: Product; language: L
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
-          <div className="text-xs text-retro-black/60 font-mono mb-1">{product.brand}</div>
-          <h3 className="font-bold text-sm font-mono text-retro-black leading-tight">{product.name}</h3>
+          <div className="text-xs text-retro-black/60 font-mono mb-1">
+            {translateBrand(product.brand, language)}
+          </div>
+          <h3 className="font-bold text-sm font-mono text-retro-black leading-tight">
+            {getProductDisplayName(product, language)}
+          </h3>
         </div>
         {product.rating && (
           <div className="text-xs font-mono text-retro-green font-bold ml-2">

@@ -2,7 +2,7 @@
 
 import type { Sundial } from "@/types/product";
 import { useTranslation, type Language } from "@/lib/i18n";
-import { getProductDisplayName, translateDosage } from "@/lib/product-translator";
+import { getProductDisplayName, translateBrand, translateDosage } from "@/lib/product-translator";
 import { generateFallbackCommentary } from "@/prompts/fallback";
 import RotatingPointer from "@/components/RotatingPointer";
 
@@ -192,7 +192,7 @@ export default function SundialDetailModal({
                   {slot.products.map((p, j) => (
                     <div key={j} className="bg-retro-green/5 border-2 border-retro-green p-2">
                       <div className="text-xs font-mono text-retro-black/60">
-                        {p.product.brand}
+                        {translateBrand(p.product.brand, language)}
                       </div>
                       <div className="font-bold text-sm font-mono text-retro-black">
                         {getProductDisplayName(p.product, language)}
