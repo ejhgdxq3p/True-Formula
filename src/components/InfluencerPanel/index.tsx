@@ -136,6 +136,22 @@ export default function InfluencerPanel({ onAdoptProducts, language }: Influence
           <div className="text-xs font-mono text-retro-black/50 bg-retro-green/10 p-2 border-2 border-retro-green">
             {t.supportedPlatforms}: YouTube, Bilibili, Douyin, Xiaohongshu
           </div>
+          <div className="text-xs font-mono text-retro-black bg-retro-yellow/20 p-2 border-2 border-retro-yellow">
+            Video analysis is temporarily unavailable.
+          </div>
+          <a
+            href="https://youtu.be/crFJiy71doo"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 text-xs font-mono font-bold text-retro-black border-2 border-retro-black px-3 py-2 bg-white hover:bg-retro-yellow/30"
+          >
+            <span>See a step-by-step example on YouTube</span>
+            <span className="inline-flex items-center justify-center w-5 h-5 border-2 border-retro-black bg-red-500">
+              <svg viewBox="0 0 24 24" className="w-3 h-3 fill-white" aria-hidden="true">
+                <path d="M23.5 6.2a3.01 3.01 0 0 0-2.12-2.13C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.57A3.01 3.01 0 0 0 .5 6.2 31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .5 5.8 3.01 3.01 0 0 0 2.12 2.13C4.5 20.5 12 20.5 12 20.5s7.5 0 9.38-.57a3.01 3.01 0 0 0 2.12-2.13A31.7 31.7 0 0 0 24 12a31.7 31.7 0 0 0-.5-5.8ZM9.75 15.5v-7l6 3.5-6 3.5Z" />
+              </svg>
+            </span>
+          </a>
         </div>
       )}
 
