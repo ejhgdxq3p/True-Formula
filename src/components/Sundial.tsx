@@ -5,7 +5,7 @@ import { useDroppable } from "@dnd-kit/core";
 import type { Sundial as SundialType } from "@/types/product";
 import RotatingPointer from "@/components/RotatingPointer";
 import { useTranslation, type Language } from "@/lib/i18n";
-import { getProductDisplayName, translateDosage } from "@/lib/product-translator";
+import { getNutrientDisplayName, getProductDisplayName, translateDosage } from "@/lib/product-translator";
 import { generateFallbackCommentary } from "@/prompts/fallback";
 
 interface SundialProps {
@@ -268,7 +268,7 @@ export function Sundial({ sundial, isOptimizing, language }: SundialProps) {
                 <div className="space-y-1">
                   {hoveredProduct.product.product.ingredients.slice(0, 5).map((ing: any, idx: number) => (
                     <div key={idx} className="text-xs font-mono text-retro-black/70 flex justify-between">
-                      <span>{ing.nutrient.commonName || ing.nutrient.name}</span>
+                      <span>{getNutrientDisplayName(ing.nutrient, language)}</span>
                       <span className="font-bold text-retro-green">
                         {ing.amount}{ing.unit}
                       </span>

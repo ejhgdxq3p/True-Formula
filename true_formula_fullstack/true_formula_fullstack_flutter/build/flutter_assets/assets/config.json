@@ -1,0 +1,5 @@
+{
+    "apiUrl": "http://localhost:8080",
+    "apiUrlAndroid": "http://192.168.48.79:8080",
+    "apiUrlEmulator": "http://10.0.2.2:8080"
+}

@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Product } from "@/types/product";
 import { ProductCategory } from "@/types/product";
 import { useTranslation, type Language } from "@/lib/i18n";
-import { getProductDisplayName, translateBrand } from "@/lib/product-translator";
+import { getNutrientDisplayName, getProductDisplayName, translateBrand } from "@/lib/product-translator";
 import { PRODUCTS_DATABASE } from "@/data/products";
 
 interface ProductLibraryModalProps {
@@ -125,7 +125,7 @@ export default function ProductLibraryModal({ onSelect, onClose, language }: Pro
                   <div className="text-xs font-mono text-retro-black/50 border-t border-retro-green/20 pt-2">
                     {product.ingredients.slice(0, 3).map((ing, i) => (
                       <span key={i}>
-                        {ing.nutrient.commonName} {ing.amount}{ing.unit}
+                        {getNutrientDisplayName(ing.nutrient, language)} {ing.amount}{ing.unit}
                         {i < Math.min(2, product.ingredients.length - 1) && ' · '}
                       </span>
                     ))}

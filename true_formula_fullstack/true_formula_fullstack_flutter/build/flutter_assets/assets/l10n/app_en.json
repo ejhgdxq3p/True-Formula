@@ -1,0 +1,139 @@
+{
+  "app": {
+    "title": "TRUE FORMULA",
+    "languageToggle": "中"
+  },
+  
+  "home": {
+    "workbench": "WORKBENCH",
+    "productLibrary": "PRODUCT LIBRARY",
+    "products": "products",
+    "newList": "+ NEW LIST",
+    "listNameHint": "List name..."
+  },
+  
+  "sundial": {
+    "title": "MY SUNDIAL",
+    "lastOptimized": "LAST OPTIMIZED",
+    "addProductsToStart": "ADD PRODUCTS TO START",
+    "aiAnalyzing": "AI ANALYZING",
+    "optimizingSchedule": "Optimizing schedule...",
+    "aiRoast": "AI ROAST",
+    "products": "PRODUCTS",
+    "conflicts": "CONFLICTS",
+    "synergies": "SYNERGIES",
+    "time": "Time",
+    "slots": "SLOTS"
+  },
+  
+  "myList": {
+    "myStack": "MY STACK",
+    "noProductsYet": "NO PRODUCTS YET",
+    "tapToAdd": "TAP BUTTON BELOW TO ADD",
+    "addProduct": "+ ADD PRODUCT"
+  },
+  
+  "community": {
+    "title": "COMMUNITY WALL",
+    "subtitle": "SEE HOW OTHERS STACK",
+    "recent": "RECENT",
+    "popular": "POPULAR",
+    "mostForked": "MOST FORKED",
+    "postMine": "POST MINE",
+    "posting": "POSTING...",
+    "refresh": "REFRESH",
+    "loadMore": "LOAD MORE",
+    "usingLocalData": "Using local data",
+    "forkThis": "FORK THIS",
+    "forkToWorkbench": "FORK TO MY WORKBENCH",
+    "likes": "LIKES",
+    "forks": "FORKS",
+    "schedule": "SCHEDULE"
+  },
+  
+  "publish": {
+    "title": "PUBLISH SUNDIAL",
+    "sundialName": "SUNDIAL NAME *",
+    "sundialNameHint": "e.g., Muscle Building Stack",
+    "authorName": "AUTHOR NAME",
+    "authorNameHint": "e.g., FitnessGuru",
+    "description": "DESCRIPTION (Optional)",
+    "descriptionHint": "Describe your stack...",
+    "publishButton": "🚀 PUBLISH",
+    "nameRequired": "Please enter sundial name"
+  },
+  
+  "influencer": {
+    "title": "INFLUENCER",
+    "textMode": "TEXT",
+    "videoMode": "VIDEO",
+    "pasteContentHint": "PASTE CONTENT...",
+    "videoUrlHint": "Paste video URL (YouTube/Bilibili/Douyin/Xiaohongshu)",
+    "supportedPlatforms": "SUPPORTED: YouTube, Bilibili, Douyin, Xiaohongshu",
+    "aiAnalyze": "AI ANALYZE",
+    "analyzing": "ANALYZING...",
+    "pasteToStart": "PASTE CONTENT TO START",
+    "credibility": "CREDIBILITY",
+    "foundProducts": "FOUND PRODUCTS",
+    "adoptSelected": "ADOPT SELECTED",
+    "notInDatabase": "NOT IN DATABASE",
+    "needsVerification": "Some products need verification",
+    "analysisFailed": "Analysis failed"
+  },
+  
+  "timing": {
+    "morning": "Morning",
+    "morningEmptyStomach": "Morning Empty Stomach",
+    "morningWithFood": "Morning With Food",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "beforeBed": "Before Bed",
+    "postWorkout": "Post-Workout",
+    "preWorkout": "Pre-Workout",
+    "withFood": "With Food",
+    "emptyStomach": "Empty Stomach",
+    "anytime": "Anytime"
+  },
+  
+  "messages": {
+    "publishSuccess": "Sundial published successfully!",
+    "publishFailed": "Failed to publish",
+    "forkSuccess": "Forked to your workbench!",
+    "forkFailed": "Fork failed",
+    "generateFirst": "Please generate a sundial first to publish!",
+    "optimizationReady": "Stack optimization complete",
+    "basedOnTiming": "Based on product timing"
+  },
+  
+  "fallbackRoasts": {
+    "noProducts": "Nothing here. Even I have nothing to say. Add something first, warrior.",
+    "fewProducts": "That's it? I've seen lazier stacks, but not many.",
+    "manyProducts": "More pills than meals? Is your body a testing ground?",
+    "hasConflicts": "See those conflicts? Your liver is crying.",
+    "perfectStack": "A rare reasonable stack. I have nothing to roast."
+  },
+  
+  "api": {
+    "notConfigured": "DeepSeek API key not configured. Please set DEEPSEEK_API_KEY in .env file",
+    "requestFailed": "API request failed",
+    "timeout": "Request timeout, please try again later"
+  },
+  
+  "database": {
+    "connectionFailed": "Database connection failed",
+    "notFound": "Record not found",
+    "duplicateEntry": "Record already exists"
+  },
+  
+  "validation": {
+    "required": "This field is required",
+    "invalidFormat": "Invalid format"
+  },
+  
+  "prompts": {
+    "sundialAnalysisSystem": "You are a sarcastic but professional supplement advisor. Give a brief, witty comment on the user's supplement stack. Requirements: 1) Keep it under 50 words; 2) Start directly with your comment, no punctuation at the beginning; 3) Be sarcastic but constructive.",
+    "sundialAnalysisUser": "User's supplement list:\n{productList}\n\nGive a one or two sentence comment on this stack (under 50 words).",
+    "influencerAnalysisSystem": "Analyze the following influencer content, identify mentioned supplements, and assess credibility. Return in JSON format.",
+    "influencerAnalysisUser": "Content: {content}\n\nIdentify supplement product names mentioned, return as JSON array."
+  }
+}

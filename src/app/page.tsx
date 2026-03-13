@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DndContext, DragOverlay, useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
 import { Sundial } from "@/components/Sundial";
 import MyList from "@/components/MyList";
@@ -9,11 +9,88 @@ import InfluencerPanel from "@/components/InfluencerPanel";
 import CommunityWall from "@/components/CommunityWall";
 import ProductLibraryModal from "@/components/ProductLibraryModal";
 import RotatingPointer from "@/components/RotatingPointer";
-import { useTranslation, type Language } from "@/lib/i18n";
+import { useTranslation, type Language, type TranslationKeys } from "@/lib/i18n";
 import { getProductDisplayName } from "@/lib/product-translator";
 import { getFallbackTexts } from "@/prompts/fallback";
-import type { Product, MyListProduct, Sundial as SundialType, SundialSlot, MyListCollection } from "@/types/product";
+import type { Product, MyListProduct, Sundial as SundialType, SundialSlot, MyListCollection, Nutrient } from "@/types/product";
+import { ProductCategory } from "@/types/product";
 import { detectProductConflicts } from "@/lib/product-conflict-detector";
+import { NUTRIENTS_DATABASE } from "@/data/nutrients";
+
+const createWomensAntioxidantStack = (language: Language, t: TranslationKeys): MyListCollection => {
+  const grapeSeedNutrient: Nutrient = {
+    id: "grape-seed",
+    name: "葡萄籽提取物",
+    commonName: "葡萄籽",
+    category: "ANTIOXIDANT" as any,
+    aliases: ["Grape Seed Extract", "OPC"],
+  };
+
+  const collagenNutrient: Nutrient = {
+    id: "collagen",
+    name: "胶原蛋白",
+    commonName: "胶原蛋白",
+    category: "ESSENTIAL_AMINO" as any,
+    aliases: ["Collagen Peptides", "Collagen"],
+  };
+
+  const vitaminC = NUTRIENTS_DATABASE.find(n => n.id === "vit-c") || {
+    id: "vit-c",
+    name: "维生素C",
+    commonName: "维生素C",
+    category: "VITAMIN_WATER_SOLUBLE" as any,
+    aliases: ["Vitamin C", "Ascorbic Acid"],
+  };
+
+  const products: Product[] = [
+    {
+      id: "preset-grape-seed",
+      name: language === "zh" ? "Swisse 葡萄籽" : "Swisse Grape Seed",
+      brand: "Swisse",
+      category: ProductCategory.BEAUTY,
+      ingredients: [{ nutrient: grapeSeedNutrient, amount: 100, unit: "mg" }],
+      dosagePerServing: language === "zh" ? "每次2粒" : "2 capsules",
+      servingsPerDay: 1,
+      optimalTiming: "MORNING_WITH_FOOD",
+    },
+    {
+      id: "preset-vitamin-c",
+      name: language === "zh" ? "Jamieson 维生素C 500mg" : "Jamieson Vitamin C 500mg",
+      brand: "Jamieson",
+      category: ProductCategory.SINGLE_VITAMIN,
+      ingredients: [{ nutrient: vitaminC, amount: 500, unit: "mg" }],
+      dosagePerServing: language === "zh" ? "每次1片" : "1 tablet",
+      servingsPerDay: 1,
+      optimalTiming: "AFTERNOON",
+    },
+    {
+      id: "preset-collagen",
+      name: language === "zh" ? "Swisse 胶原蛋白" : "Swisse Collagen",
+      brand: "Swisse",
+      category: ProductCategory.BEAUTY,
+      ingredients: [{ nutrient: collagenNutrient, amount: 5, unit: "g" }],
+      dosagePerServing: language === "zh" ? "每次1瓶" : "1 bottle",
+      servingsPerDay: 1,
+      optimalTiming: "BEFORE_BED",
+    },
+  ];
+
+  const now = new Date();
+
+  return {
+    id: "default-list",
+    name: t.mockTitle2,
+    products: products.map(product => ({
+      productId: product.id,
+      product,
+      addedAt: now,
+    })),
+    createdAt: now,
+    updatedAt: now,
+    isFork: false,
+    conflictCount: 0,
+  };
+};
 
 export default function Home() {
   const [language] = useState<Language>('en');
@@ -21,15 +98,7 @@ export default function Home() {
 
   // === 多 List 管理 ===
   const [myLists, setMyLists] = useState<MyListCollection[]>([
-    {
-      id: "default-list",
-      name: t.myList,
-      products: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isFork: false,
-      conflictCount: 0,
-    }
+    createWomensAntioxidantStack(language, t),
   ]);
   const [forkedLists, setForkedLists] = useState<MyListCollection[]>([]);
   const [currentListId, setCurrentListId] = useState<string>("default-list");
@@ -219,7 +288,14 @@ export default function Home() {
     }
   };
 
-  // 获取AI点评（确保使用真实AI）
+  // Default display: Women's Antioxidant Stack
+  useEffect(() => {
+    if (!sundial && currentList && currentList.products.length > 0) {
+      triggerOptimization(currentList.products);
+    }
+  }, [sundial, currentList]);
+
+  // Fetch AI commentary
   const fetchAICommentary = async (sundial: SundialType): Promise<string> => {
     try {
       console.log('[AI Commentary] Calling API...');

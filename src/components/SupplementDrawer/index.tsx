@@ -7,6 +7,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import RotatingPointer from "@/components/RotatingPointer";
 import { useTranslation, type Language } from "@/lib/i18n";
+import { getNutrientDisplayName } from "@/lib/product-translator";
 
 interface ProductDrawerProps {
   products: Product[];
@@ -99,14 +100,14 @@ export default function SupplementDrawer({ products, language }: ProductDrawerPr
       {/* 产品列表 */}
       <div className="flex-1 overflow-y-auto space-y-2 pr-1">
         {filteredProducts.map(product => (
-          <DraggableProduct key={product.id} product={product} />
+          <DraggableProduct key={product.id} product={product} language={language} />
         ))}
       </div>
     </div>
   );
 }
 
-function DraggableProduct({ product }: { product: Product }) {
+function DraggableProduct({ product, language }: { product: Product; language: Language }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `library-${product.id}`,
     data: { 
@@ -155,7 +156,7 @@ function DraggableProduct({ product }: { product: Product }) {
       <div className="text-xs font-mono text-retro-black/50 border-t border-retro-green/20 pt-2 mt-2">
         {product.ingredients.slice(0, 3).map((ing, i) => (
           <span key={i}>
-            {ing.nutrient.commonName} {ing.amount}{ing.unit}
+            {getNutrientDisplayName(ing.nutrient, language)} {ing.amount}{ing.unit}
             {i < Math.min(2, product.ingredients.length - 1) && ' · '}
           </span>
         ))}

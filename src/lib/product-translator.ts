@@ -1,4 +1,4 @@
-import type { Product } from "@/types/product";
+import type { Product, Nutrient } from "@/types/product";
 import type { Language } from "./i18n";
 
 /**
@@ -247,6 +247,20 @@ export function translateNutrientName(nutrientName: string, language: Language):
   }
   
   return nutrientName;
+}
+
+/**
+ * 获取营养成分显示名（优先英文别名）
+ */
+export function getNutrientDisplayName(nutrient: Nutrient, language: Language): string {
+  if (language === 'zh') {
+    return nutrient.commonName || nutrient.name;
+  }
+
+  const alias = (nutrient.aliases || []).find(a => /[A-Za-z]/.test(a));
+  if (alias) return alias;
+
+  return translateNutrientName(nutrient.commonName || nutrient.name, language);
 }
 
 /**

@@ -1,0 +1,139 @@
+{
+  "app": {
+    "title": "真配方",
+    "languageToggle": "EN"
+  },
+  
+  "home": {
+    "workbench": "工作台",
+    "productLibrary": "产品库",
+    "products": "个产品",
+    "newList": "+ 新建列表",
+    "listNameHint": "列表名称..."
+  },
+  
+  "sundial": {
+    "title": "我的日晷",
+    "lastOptimized": "最后优化",
+    "addProductsToStart": "加产品开始优化",
+    "aiAnalyzing": "AI 正在分析",
+    "optimizingSchedule": "检测冲突、优化时间表...",
+    "aiRoast": "AI 毒舌点评",
+    "products": "产品",
+    "conflicts": "冲突",
+    "synergies": "协同",
+    "time": "时间",
+    "slots": "个时间点"
+  },
+  
+  "myList": {
+    "myStack": "我的配方",
+    "noProductsYet": "还没有产品",
+    "tapToAdd": "点击下方按钮添加",
+    "addProduct": "+ 添加产品"
+  },
+  
+  "community": {
+    "title": "社区日晷墙",
+    "subtitle": "看看别人怎么吃",
+    "recent": "最新",
+    "popular": "热门",
+    "mostForked": "最多Fork",
+    "postMine": "发布我的",
+    "posting": "发布中...",
+    "refresh": "刷新",
+    "loadMore": "加载更多",
+    "usingLocalData": "使用本地数据",
+    "forkThis": "FORK 此日晷",
+    "forkToWorkbench": "FORK 到我的工作台",
+    "likes": "点赞",
+    "forks": "复制",
+    "schedule": "服用时间表"
+  },
+  
+  "publish": {
+    "title": "发布日晷到社区",
+    "sundialName": "日晷名称 *",
+    "sundialNameHint": "例如：增肌补剂日晷",
+    "authorName": "作者昵称",
+    "authorNameHint": "例如：健身达人小王",
+    "description": "描述（可选）",
+    "descriptionHint": "简单介绍一下这个配方...",
+    "publishButton": "🚀 发布到社区",
+    "nameRequired": "请输入日晷名称"
+  },
+  
+  "influencer": {
+    "title": "博主推荐",
+    "textMode": "文字",
+    "videoMode": "视频",
+    "pasteContentHint": "粘贴博主推荐文字...",
+    "videoUrlHint": "粘贴视频链接（YouTube/B站/抖音/小红书）",
+    "supportedPlatforms": "支持: YouTube, Bilibili, Douyin, Xiaohongshu",
+    "aiAnalyze": "AI分析",
+    "analyzing": "AI分析中...",
+    "pasteToStart": "粘贴博主内容开始分析",
+    "credibility": "可信度",
+    "foundProducts": "发现产品",
+    "adoptSelected": "采用选中产品",
+    "notInDatabase": "数据库中未找到",
+    "needsVerification": "部分产品需验证",
+    "analysisFailed": "分析失败"
+  },
+  
+  "timing": {
+    "morning": "早晨",
+    "morningEmptyStomach": "早晨空腹",
+    "morningWithFood": "早晨随餐",
+    "afternoon": "下午",
+    "evening": "傍晚",
+    "beforeBed": "睡前",
+    "postWorkout": "运动后",
+    "preWorkout": "运动前",
+    "withFood": "随餐",
+    "emptyStomach": "空腹",
+    "anytime": "任何时间"
+  },
+  
+  "messages": {
+    "publishSuccess": "日晷已成功发布！",
+    "publishFailed": "发布失败",
+    "forkSuccess": "已复制到你的工作台！",
+    "forkFailed": "复制失败",
+    "generateFirst": "请先生成一个日晷才能发布！",
+    "optimizationReady": "配方优化完成",
+    "basedOnTiming": "基于产品推荐时间"
+  },
+  
+  "fallbackRoasts": {
+    "noProducts": "空空如也，连我都无话可说。先加点东西吧，勇士。",
+    "fewProducts": "就这？我见过更敷衍的，但不多。",
+    "manyProducts": "补剂吃得比饭还多，身体是用来试药的吗？",
+    "hasConflicts": "看到这些冲突了吗？你的肝在哭泣。",
+    "perfectStack": "难得一见的合理搭配，我竟无话可怼。"
+  },
+  
+  "api": {
+    "notConfigured": "DeepSeek API key 未配置。请在 .env 文件中设置 DEEPSEEK_API_KEY",
+    "requestFailed": "API 请求失败",
+    "timeout": "请求超时，请稍后重试"
+  },
+  
+  "database": {
+    "connectionFailed": "数据库连接失败",
+    "notFound": "未找到记录",
+    "duplicateEntry": "记录已存在"
+  },
+  
+  "validation": {
+    "required": "此字段为必填项",
+    "invalidFormat": "格式无效"
+  },
+  
+  "prompts": {
+    "sundialAnalysisSystem": "你是一位毒舌但专业的补剂顾问。用简短幽默的风格点评用户的补剂搭配。要求：1）控制在50字以内；2）直接给出点评，不要用任何标点符号开头；3）可以毒舌但要有建设性。",
+    "sundialAnalysisUser": "用户的补剂列表：\n{productList}\n\n请用一两句话点评这个搭配（50字以内）。",
+    "influencerAnalysisSystem": "分析以下博主推荐内容，识别提到的补剂产品，评估可信度。返回JSON格式。",
+    "influencerAnalysisUser": "内容：{content}\n\n请识别其中提到的补剂产品名称，返回JSON数组格式。"
+  }
+}

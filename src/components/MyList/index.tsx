@@ -2,7 +2,7 @@
 
 import type { MyListCollection } from "@/types/product";
 import { useTranslation, type Language } from "@/lib/i18n";
-import { getProductDisplayName } from "@/lib/product-translator";
+import { getNutrientDisplayName, getProductDisplayName } from "@/lib/product-translator";
 import RotatingPointer from "@/components/RotatingPointer";
 
 interface MyListProps {
@@ -106,7 +106,7 @@ export default function MyList({
                         <div className="text-xs font-mono text-retro-black/50 mt-1">
                           {item.product.ingredients.slice(0, 2).map((ing, i) => (
                             <span key={i}>
-                              {ing.nutrient.commonName}
+                              {getNutrientDisplayName(ing.nutrient, language)}
                               {i < Math.min(1, item.product.ingredients.length - 1) && ' · '}
                             </span>
                           ))}
