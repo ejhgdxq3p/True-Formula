@@ -11,7 +11,7 @@ import { PRODUCTS_DATABASE } from "@/data/products";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { text, mode, language = 'zh' } = body as { text: string; mode: string; language?: Language };
+    const { text, mode, language = 'en' } = body as { text: string; mode: string; language?: Language };
 
     if (!text || typeof text !== "string") {
       return NextResponse.json(

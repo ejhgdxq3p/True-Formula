@@ -27,7 +27,7 @@ function getAIProvider(): "claude" | "deepseek" {
 export async function analyzeVideoContent(
   content: string,
   contentType: "transcript" | "description",
-  language: Language = 'zh'
+  language: Language = 'en'
 ): Promise<VideoAnalysisResult> {
   const provider = getAIProvider();
 
@@ -48,7 +48,7 @@ export async function analyzeVideoContent(
 async function analyzeWithClaude(
   content: string,
   contentType: "transcript" | "description",
-  language: Language = 'zh'
+  language: Language = 'en'
 ): Promise<VideoAnalysisResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
 

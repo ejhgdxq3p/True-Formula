@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`[AI排程] 处理 ${products.length} 个产品，${conflicts?.length || 0} 个冲突`);
 
-    const schedule = await generateAISchedule(products, conflicts || [], language || 'zh');
+    const schedule = await generateAISchedule(products, conflicts || [], language || 'en');
 
     return NextResponse.json({
       success: true,

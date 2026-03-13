@@ -15,7 +15,7 @@ import { getAnalysisPrompt } from "@/prompts/analysis";
 export async function analyzeWithDeepSeek(
   content: string,
   contentType: "transcript" | "description",
-  language: Language = 'zh'
+  language: Language = 'en'
 ): Promise<VideoAnalysisResult> {
   const apiKey = process.env.DEEPSEEK_API_KEY?.trim();
   const baseURL = process.env.DEEPSEEK_BASE_URL?.trim();

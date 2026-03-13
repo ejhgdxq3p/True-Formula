@@ -11,7 +11,7 @@ import { generateFallbackCommentary } from "@/prompts/fallback";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { sundial, language = 'zh' } = body as { sundial: any; language?: Language };
+    const { sundial, language = 'en' } = body as { sundial: any; language?: Language };
 
     if (!sundial || !sundial.timeSlots) {
       return NextResponse.json(

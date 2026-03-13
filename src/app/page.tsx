@@ -16,7 +16,7 @@ import type { Product, MyListProduct, Sundial as SundialType, SundialSlot, MyLis
 import { detectProductConflicts } from "@/lib/product-conflict-detector";
 
 export default function Home() {
-  const [language, setLanguage] = useState<Language>('zh');
+  const [language] = useState<Language>('en');
   const t = useTranslation(language);
 
   // === 多 List 管理 ===
@@ -349,14 +349,6 @@ export default function Home() {
               {t.appTitle}
               <RotatingPointer />
             </h1>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
-                className="retro-button px-4 py-2 text-sm font-mono"
-              >
-                {t.langSwitch}
-              </button>
-            </div>
           </div>
         </header>
 
